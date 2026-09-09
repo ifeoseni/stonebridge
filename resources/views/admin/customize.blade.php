@@ -360,13 +360,13 @@
                     <h2>Clientele Criteria (The 8 Qualities)</h2>
                 </div>
                 <div class="inside">
+                    <p style="color:#646970; margin-bottom:16px;">Edit the wording and active status of each item below. Items cannot be added or removed &mdash; only their text and visibility can be changed.</p>
                     <table class="wp-list-table" style="margin-bottom:20px;">
                         <thead>
                             <tr>
                                 <th style="width:40px;">#</th>
                                 <th>Criteria Description</th>
                                 <th style="width:80px;">Active</th>
-                                <th style="width:90px;">Actions</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -379,25 +379,10 @@
                                     <td style="text-align:center; vertical-align:top; padding-top:16px;">
                                         <input type="checkbox" name="criteria[{{ $c->id }}][is_active]" value="1" {{ $c->is_active ? 'checked' : '' }}>
                                     </td>
-                                    <td style="vertical-align:top; padding-top:14px;">
-                                        <form action="{{ route('admin.customize.criteria.delete', $c->id) }}" method="POST" onsubmit="return confirm('Remove this criterion?');" style="display:inline;">
-                                            @csrf
-                                            @method('DELETE')
-                                            <button type="submit" class="button button-danger button-small">Delete</button>
-                                        </form>
-                                    </td>
                                 </tr>
                             @endforeach
                         </tbody>
                     </table>
-
-                    <div style="background:#f9f9f9; border:1px dashed #c3c4c7; padding:16px; margin-bottom:16px;">
-                        <strong>Add New Criterion:</strong>
-                        <div style="display:flex; gap:12px; margin-top:8px;">
-                            <input type="text" name="new_criterion" placeholder="e.g. Navigating generational leadership transitions" class="large-text" style="flex:1;">
-                            <button type="submit" class="button button-secondary">Add Item</button>
-                        </div>
-                    </div>
 
                     <p class="submit">
                         <button type="submit" class="button button-primary">Save Changes to Criteria</button>
@@ -474,18 +459,14 @@
                     <h2>Retainer Engagement Formats (Two Column Lists)</h2>
                 </div>
                 <div class="inside">
+                    <p style="color:#646970; margin-bottom:16px;">Edit the wording of each engagement format below. Items cannot be added or removed &mdash; only their text can be changed.</p>
                     <div style="display:grid; grid-template-columns:1fr 1fr; gap:32px; margin-bottom:24px;">
                         <!-- Column Left -->
                         <div>
                             <h3 style="font-size:14px; margin-bottom:10px; color:#1d2327;">Column 1 (Scheduled & Direct Access)</h3>
                             @foreach($retainerLeft as $item)
-                                <div style="display:flex; gap:8px; margin-bottom:12px; align-items:flex-start;">
-                                    <textarea name="engagements[{{ $item->id }}][title]" rows="2" class="large-text" style="flex:1; min-height:55px; font-size:13.5px;">{{ $item->title }}</textarea>
-                                    <form action="{{ route('admin.customize.retainers.delete', $item->id) }}" method="POST" onsubmit="return confirm('Remove item?');" style="display:inline;">
-                                        @csrf
-                                        @method('DELETE')
-                                        <button type="submit" class="button button-danger button-small" style="margin-top:4px;">✕</button>
-                                    </form>
+                                <div style="margin-bottom:12px;">
+                                    <textarea name="engagements[{{ $item->id }}][title]" rows="2" class="large-text" style="width:100%; min-height:55px; font-size:13.5px;">{{ $item->title }}</textarea>
                                 </div>
                             @endforeach
                         </div>
@@ -494,27 +475,10 @@
                         <div>
                             <h3 style="font-size:14px; margin-bottom:10px; color:#1d2327;">Column 2 (Intensives & Specialized)</h3>
                             @foreach($retainerRight as $item)
-                                <div style="display:flex; gap:8px; margin-bottom:12px; align-items:flex-start;">
-                                    <textarea name="engagements[{{ $item->id }}][title]" rows="2" class="large-text" style="flex:1; min-height:55px; font-size:13.5px;">{{ $item->title }}</textarea>
-                                    <form action="{{ route('admin.customize.retainers.delete', $item->id) }}" method="POST" onsubmit="return confirm('Remove item?');" style="display:inline;">
-                                        @csrf
-                                        @method('DELETE')
-                                        <button type="submit" class="button button-danger button-small" style="margin-top:4px;">✕</button>
-                                    </form>
+                                <div style="margin-bottom:12px;">
+                                    <textarea name="engagements[{{ $item->id }}][title]" rows="2" class="large-text" style="width:100%; min-height:55px; font-size:13.5px;">{{ $item->title }}</textarea>
                                 </div>
                             @endforeach
-                        </div>
-                    </div>
-
-                    <div style="background:#f9f9f9; border:1px dashed #c3c4c7; padding:16px; margin-bottom:16px;">
-                        <strong>Add New Engagement Format:</strong>
-                        <div style="display:flex; gap:12px; margin-top:8px;">
-                            <select name="new_column" style="padding:6px 12px; border:1px solid #8c8f94; border-radius:4px;">
-                                <option value="left">Column 1 (Left)</option>
-                                <option value="right">Column 2 (Right)</option>
-                            </select>
-                            <input type="text" name="new_title" placeholder="e.g. Quarterly strategic reflection sessions" class="large-text" style="flex:1;">
-                            <button type="submit" class="button button-secondary">Add Item</button>
                         </div>
                     </div>
 
@@ -651,6 +615,94 @@
                 </div>
             </div>
         </form>
+
+        <form action="{{ route('admin.customize.settings') }}" method="POST">
+            @csrf
+            <input type="hidden" name="tab" value="inquiry">
+
+            <div class="postbox">
+                <div class="postbox-header">
+                    <h2>Form Field Placeholders</h2>
+                </div>
+                <div class="inside">
+                    <table class="form-table">
+                        <tr>
+                            <th><label for="inquiry_placeholder_name">Full Name Placeholder</label></th>
+                            <td>
+                                <input type="text" name="inquiry_placeholder_name" id="inquiry_placeholder_name" class="regular-text" value="{{ \App\Models\SiteSetting::get('inquiry_placeholder_name', 'Full Name') }}">
+                            </td>
+                        </tr>
+                        <tr>
+                            <th><label for="inquiry_placeholder_email">Email Placeholder</label></th>
+                            <td>
+                                <input type="text" name="inquiry_placeholder_email" id="inquiry_placeholder_email" class="regular-text" value="{{ \App\Models\SiteSetting::get('inquiry_placeholder_email', 'Email Address') }}">
+                            </td>
+                        </tr>
+                        <tr>
+                            <th><label for="inquiry_placeholder_phone">Phone Placeholder</label></th>
+                            <td>
+                                <input type="text" name="inquiry_placeholder_phone" id="inquiry_placeholder_phone" class="regular-text" value="{{ \App\Models\SiteSetting::get('inquiry_placeholder_phone', 'Phone Number') }}">
+                            </td>
+                        </tr>
+                        <tr>
+                            <th><label for="inquiry_placeholder_circumstances">Circumstances Placeholder</label></th>
+                            <td>
+                                <input type="text" name="inquiry_placeholder_circumstances" id="inquiry_placeholder_circumstances" class="regular-text" value="{{ \App\Models\SiteSetting::get('inquiry_placeholder_circumstances', 'Brief description of your circumstances') }}">
+                            </td>
+                        </tr>
+                        <tr>
+                            <th><label for="inquiry_placeholder_motivation">Motivation Placeholder</label></th>
+                            <td>
+                                <input type="text" name="inquiry_placeholder_motivation" id="inquiry_placeholder_motivation" class="regular-text" value="{{ \App\Models\SiteSetting::get('inquiry_placeholder_motivation', 'What led you to explore this type of relationship?') }}">
+                            </td>
+                        </tr>
+                    </table>
+
+                    <p class="submit" style="padding-top:10px;">
+                        <button type="submit" class="button button-primary">Save Placeholders</button>
+                    </p>
+                </div>
+            </div>
+        </form>
+
+        <form action="{{ route('admin.customize.settings') }}" method="POST">
+            @csrf
+            <input type="hidden" name="tab" value="inquiry">
+
+            <div class="postbox">
+                <div class="postbox-header">
+                    <h2>Form Status Messages</h2>
+                </div>
+                <div class="inside">
+                    <table class="form-table">
+                        <tr>
+                            <th><label for="inquiry_sending_label">Submitting State Label</label></th>
+                            <td>
+                                <input type="text" name="inquiry_sending_label" id="inquiry_sending_label" class="regular-text" value="{{ \App\Models\SiteSetting::get('inquiry_sending_label', 'TRANSMITTING...') }}">
+                                <p class="description">Shown on the submit button while the inquiry is being sent.</p>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th><label for="inquiry_validation_error">Validation Error Message</label></th>
+                            <td>
+                                <input type="text" name="inquiry_validation_error" id="inquiry_validation_error" class="regular-text" value="{{ \App\Models\SiteSetting::get('inquiry_validation_error', 'Please check required fields.') }}">
+                            </td>
+                        </tr>
+                        <tr>
+                            <th><label for="inquiry_fallback_success">Fallback Success Message</label></th>
+                            <td>
+                                <textarea name="inquiry_fallback_success" id="inquiry_fallback_success" rows="2" class="large-text">{{ \App\Models\SiteSetting::get('inquiry_fallback_success', 'Your confidential inquiry has been recorded. Thank you.') }}</textarea>
+                                <p class="description">Shown if the network request fails but the browser could not confirm delivery.</p>
+                            </td>
+                        </tr>
+                    </table>
+
+                    <p class="submit" style="padding-top:10px;">
+                        <button type="submit" class="button button-primary">Save Status Messages</button>
+                    </p>
+                </div>
+            </div>
+        </form>
     @endif
 
     <!-- =========================================================================
@@ -677,6 +729,32 @@
                             <th><label for="header_cta_text">Top Right CTA Button Label</label></th>
                             <td>
                                 <input type="text" name="header_cta_text" id="header_cta_text" class="regular-text" value="{{ \App\Models\SiteSetting::get('header_cta_text') }}">
+                            </td>
+                        </tr>
+                        <tr>
+                            <th><label for="header_cta_link">Top Right CTA Button Link</label></th>
+                            <td>
+                                <input type="text" name="header_cta_link" id="header_cta_link" class="regular-text" value="{{ \App\Models\SiteSetting::get('header_cta_link') }}">
+                                <p class="description">Defaults to <code>#private-inquiry</code> for smooth scroll to inquiry form.</p>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th><label for="header_docs_label">Documents Menu Label</label></th>
+                            <td>
+                                <input type="text" name="header_docs_label" id="header_docs_label" class="regular-text" value="{{ \App\Models\SiteSetting::get('header_docs_label', 'DOCUMENTS') }}">
+                                <p class="description">Label for the discreet header dropdown that lists confidential sub-pages.</p>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th><label for="modal_eyebrow">Document Modal Eyebrow Text</label></th>
+                            <td>
+                                <input type="text" name="modal_eyebrow" id="modal_eyebrow" class="regular-text" value="{{ \App\Models\SiteSetting::get('modal_eyebrow', 'CONFIDENTIAL CHARTER') }}">
+                            </td>
+                        </tr>
+                        <tr>
+                            <th><label for="modal_close_label">Document Modal Close Button Label</label></th>
+                            <td>
+                                <input type="text" name="modal_close_label" id="modal_close_label" class="regular-text" value="{{ \App\Models\SiteSetting::get('modal_close_label', 'Close Document') }}">
                             </td>
                         </tr>
                         <tr>

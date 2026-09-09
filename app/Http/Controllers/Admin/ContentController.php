@@ -118,27 +118,8 @@ class ContentController extends Controller
             }
         }
 
-        // Add new criterion if provided
-        if (!empty($request->input('new_criterion'))) {
-            ClienteleCriterion::create([
-                'text' => $request->input('new_criterion'),
-                'order' => ClienteleCriterion::max('order') + 1,
-                'is_active' => true,
-            ]);
-        }
-
         return redirect()->route('admin.customize', ['tab' => 'clientele'])
             ->with('success', 'Clientele criteria updated successfully!');
-    }
-
-    /**
-     * Delete a criterion
-     */
-    public function deleteCriterion($id)
-    {
-        ClienteleCriterion::destroy($id);
-        return redirect()->route('admin.customize', ['tab' => 'clientele'])
-            ->with('success', 'Criterion removed.');
     }
 
     /**
@@ -156,26 +137,7 @@ class ContentController extends Controller
             }
         }
 
-        // Add new engagement item if provided
-        if (!empty($request->input('new_title'))) {
-            RetainerEngagement::create([
-                'column_side' => $request->input('new_column', 'left'),
-                'title' => $request->input('new_title'),
-                'order' => RetainerEngagement::where('column_side', $request->input('new_column', 'left'))->max('order') + 1,
-            ]);
-        }
-
         return redirect()->route('admin.customize', ['tab' => 'retainer'])
             ->with('success', 'Retainer engagements updated successfully!');
-    }
-
-    /**
-     * Delete a retainer item
-     */
-    public function deleteRetainer($id)
-    {
-        RetainerEngagement::destroy($id);
-        return redirect()->route('admin.customize', ['tab' => 'retainer'])
-            ->with('success', 'Retainer item removed.');
     }
 }

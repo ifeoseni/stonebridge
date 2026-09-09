@@ -30,9 +30,7 @@ Route::middleware('auth')->prefix('admin')->name('admin.')->group(function () {
     Route::post('/customize/settings', [ContentController::class, 'updateSettings'])->name('customize.settings');
     Route::post('/customize/pillars', [ContentController::class, 'updatePillars'])->name('customize.pillars');
     Route::post('/customize/criteria', [ContentController::class, 'updateCriteria'])->name('customize.criteria');
-    Route::delete('/customize/criteria/{id}', [ContentController::class, 'deleteCriterion'])->name('customize.criteria.delete');
     Route::post('/customize/retainers', [ContentController::class, 'updateRetainers'])->name('customize.retainers');
-    Route::delete('/customize/retainers/{id}', [ContentController::class, 'deleteRetainer'])->name('customize.retainers.delete');
 
     // Private Inquiries Lead Inbox
     Route::get('/inquiries', [AdminInquiryController::class, 'index'])->name('inquiries.index');

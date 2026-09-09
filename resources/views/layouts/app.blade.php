@@ -273,7 +273,7 @@
             @if(isset($subPages) && count($subPages) > 0)
                 <div class="header-docs-dropdown">
                     <button type="button" class="header-docs-btn" onclick="toggleDocsMenu(event)">
-                        <span>DOCUMENTS</span>
+                        <span>{{ $settings['header_docs_label'] ?? 'DOCUMENTS' }}</span>
                         <svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
                     </button>
                     <div class="header-docs-menu" id="headerDocsMenu">
@@ -302,14 +302,14 @@
         <div class="modal-card">
             <button class="modal-close" onclick="closeModal()">&times;</button>
             <div style="font-size:11px; letter-spacing:0.25em; text-transform:uppercase; color:var(--gold-accent); font-weight:600; margin-bottom:12px;">
-                CONFIDENTIAL CHARTER
+                {{ $settings['modal_eyebrow'] ?? 'CONFIDENTIAL CHARTER' }}
             </div>
             <h2 class="serif" id="modalTitle" style="font-size:36px; font-weight:400; color:#f5f3ef; margin-bottom:8px; line-height:1.2;"></h2>
             <p id="modalSubtitle" style="color:var(--gold-text); font-size:15px; margin-bottom:24px; font-style:italic; border-bottom:1px solid rgba(255,255,255,0.1); padding-bottom:16px;"></p>
             <div id="modalContent" style="color:#c5c8cc; font-size:15px; line-height:1.85;"></div>
             <div style="margin-top:36px; padding-top:20px; border-top:1px solid rgba(255,255,255,0.08); display:flex; justify-content:space-between; align-items:center;">
-                <span style="font-size:11px; letter-spacing:0.2em; text-transform:uppercase; color:#686d73;">Stonebridge Advisory</span>
-                <button onclick="closeModal()" class="header-btn">Close Document</button>
+                <span style="font-size:11px; letter-spacing:0.2em; text-transform:uppercase; color:#686d73;">{{ $settings['brand_name'] ?? 'STONEBRIDGE ADVISORY' }}</span>
+                <button onclick="closeModal()" class="header-btn">{{ $settings['modal_close_label'] ?? 'Close Document' }}</button>
             </div>
         </div>
     </div>

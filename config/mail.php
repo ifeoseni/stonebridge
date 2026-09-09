@@ -45,8 +45,32 @@ return [
             'port' => env('MAIL_PORT', 2525),
             'username' => env('MAIL_USERNAME'),
             'password' => env('MAIL_PASSWORD'),
+            'encryption' => env('MAIL_ENCRYPTION'),
             'timeout' => null,
             'local_domain' => env('MAIL_EHLO_DOMAIN', parse_url((string) env('APP_URL', 'http://localhost'), PHP_URL_HOST)),
+            'verify_peer' => false,
+            'verify_peer_name' => false,
+            'stream' => [
+                'ssl' => [
+                    'allow_self_signed' => true,
+                    'verify_peer' => false,
+                    'verify_peer_name' => false,
+                ],
+            ],
+            'context' => [
+                'ssl' => [
+                    'allow_self_signed' => true,
+                    'verify_peer' => false,
+                    'verify_peer_name' => false,
+                ],
+            ],
+        ],
+
+        'mailgun' => [
+            'transport' => 'mailgun',
+            // 'client' => [
+            //     'timeout' => 5,
+            // ],
         ],
 
         'ses' => [
@@ -111,8 +135,20 @@ return [
     */
 
     'from' => [
-        'address' => env('MAIL_FROM_ADDRESS', 'hello@example.com'),
-        'name' => env('MAIL_FROM_NAME', env('APP_NAME', 'Laravel')),
+        'address' => env('MAIL_FROM_ADDRESS', 'info@stonebridgeadvisory.com'),
+        'name' => env('MAIL_FROM_NAME', env('APP_NAME', 'Stonebridge Advisory')),
     ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Contact / Private Inquiry Recipient Address
+    |--------------------------------------------------------------------------
+    |
+    | This email address receives notifications whenever a visitor submits
+    | a private inquiry or contact form on the website.
+    |
+    */
+
+    'contact_recipient' => env('CONTACT_RECIPIENT_EMAIL', env('MAIL_FROM_ADDRESS', 'inquiries@stonebridgeadvisory.com')),
 
 ];

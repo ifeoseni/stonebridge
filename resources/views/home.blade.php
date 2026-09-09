@@ -289,26 +289,26 @@
     .serves-disclaimer-col-left {
         display: flex;
         flex-direction: column;
-        align-items: center;
-        text-align: center;
+        align-items: flex-start;
+        text-align: left;
         width: 100%;
     }
     .serves-small-divider {
         width: 26px;
         height: 1px;
         background-color: rgba(40, 35, 30, 0.28);
-        margin: 0 auto 12px auto;
+        margin: 0 0 12px 0;
         display: block;
     }
     .serves-footer-note {
-        text-align: center;
+        text-align: left;
         font-family: var(--font-serif);
         font-style: italic;
         font-size: 13px;
         line-height: 1.45;
         color: #8c8275;
         max-width: 290px;
-        margin: 0 auto;
+        margin: 0;
     }
 
     /* ==========================================================================
@@ -590,6 +590,7 @@
         .serves-flex { grid-template-columns: 1fr; gap: 32px; }
         .criteria-2col { grid-template-columns: 1fr; }
         .serves-disclaimer-row { grid-template-columns: 1fr; margin-top: 24px; }
+        .serves-disclaimer-row > div:first-child { display: none; }
         .retainer-wrap { grid-template-columns: 1fr; }
         .retainer-photo-side { min-height: 380px; }
         .founder-wrap { grid-template-columns: 1fr; }
@@ -708,6 +709,7 @@
                 </div>
 
                 <div class="serves-disclaimer-row">
+                    <div></div>
                     <div class="serves-disclaimer-col-left">
                         <div class="serves-small-divider"></div>
                         <div class="serves-footer-note">
@@ -792,14 +794,14 @@
                     @csrf
 
                     <div class="inquiry-row-3">
-                        <input type="text" name="full_name" class="inquiry-input" placeholder="Full Name" required>
-                        <input type="email" name="email" class="inquiry-input" placeholder="Email Address" required>
-                        <input type="tel" name="phone" class="inquiry-input" placeholder="Phone Number">
+                        <input type="text" name="full_name" class="inquiry-input" placeholder="{{ $settings['inquiry_placeholder_name'] ?? 'Full Name' }}" required>
+                        <input type="email" name="email" class="inquiry-input" placeholder="{{ $settings['inquiry_placeholder_email'] ?? 'Email Address' }}" required>
+                        <input type="tel" name="phone" class="inquiry-input" placeholder="{{ $settings['inquiry_placeholder_phone'] ?? 'Phone Number' }}">
                     </div>
 
-                    <input type="text" name="circumstances" class="inquiry-input" placeholder="Brief description of your circumstances" required>
+                    <input type="text" name="circumstances" class="inquiry-input" placeholder="{{ $settings['inquiry_placeholder_circumstances'] ?? 'Brief description of your circumstances' }}" required>
 
-                    <input type="text" name="motivation" class="inquiry-input" placeholder="What led you to explore this type of relationship?">
+                    <input type="text" name="motivation" class="inquiry-input" placeholder="{{ $settings['inquiry_placeholder_motivation'] ?? 'What led you to explore this type of relationship?' }}">
 
                     <div class="inquiry-footer-row">
                         <div class="lock-notice">
@@ -810,7 +812,7 @@
                             <span>{{ $settings['inquiry_disclaimer'] ?? 'All inquiries are confidential.' }}</span>
                         </div>
 
-                        <button type="submit" class="btn-gold-solid" id="submitBtn">
+                        <button type="submit" class="btn-form-submit" id="submitBtn">
                             {{ $settings['inquiry_btn_text'] ?? 'PRIVATE INQUIRY' }}
                         </button>
                     </div>
@@ -839,12 +841,17 @@
     const form = document.getElementById('inquiryForm');
     const alertBox = document.getElementById('inquiryAlert');
     const btn = document.getElementById('submitBtn');
+    const inquiryText = {
+        sending: {{ Illuminate\Support\Js::from($settings['inquiry_sending_label'] ?? 'TRANSMITTING...') }},
+        validationError: {{ Illuminate\Support\Js::from($settings['inquiry_validation_error'] ?? 'Please check required fields.') }},
+        fallbackSuccess: {{ Illuminate\Support\Js::from($settings['inquiry_fallback_success'] ?? 'Your confidential inquiry has been recorded. Thank you.') }}
+    };
 
     if (form) {
         form.addEventListener('submit', function(e) {
             e.preventDefault();
             const originalLabel = btn.innerText;
-            btn.innerText = 'TRANSMITTING...';
+            btn.innerText = inquiryText.sending;
             btn.disabled = true;
 
             const formData = new FormData(form);
@@ -866,14 +873,14 @@
                     alertBox.style.display = 'block';
                     form.reset();
                 } else {
-                    alertBox.innerText = 'Please check required fields.';
+                    alertBox.innerText = inquiryText.validationError;
                     alertBox.style.display = 'block';
                 }
             })
             .catch(err => {
                 btn.innerText = originalLabel;
                 btn.disabled = false;
-                alertBox.innerText = 'Your confidential inquiry has been recorded. Thank you.';
+                alertBox.innerText = inquiryText.fallbackSuccess;
                 alertBox.style.display = 'block';
                 form.reset();
             });
