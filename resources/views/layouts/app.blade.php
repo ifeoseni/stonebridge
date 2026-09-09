@@ -12,11 +12,36 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,500&family=Plus+Jakarta+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 
-    <!-- Immediate Theme Initialization Script (prevents flash) -->
+    <meta name="theme-color" id="metaThemeColor" content="#090c0f">
+
+    <!-- Immediate Theme Initialization Script (prevents flash & synchronizes with device theme) -->
     <script>
         (function() {
-            const savedTheme = localStorage.getItem('stonebridge_theme') || '{{ $settings["default_theme"] ?? "dark" }}';
+            const hasMedia = window.matchMedia;
+            const devicePrefersDark = hasMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+            const currentDeviceTheme = devicePrefersDark ? 'dark' : 'light';
+            const lastDeviceTheme = localStorage.getItem('stonebridge_last_device_theme');
+            let savedTheme = localStorage.getItem('stonebridge_theme');
+
+            // If the user changed their device/phone OS theme setting, automatically sync to match the device
+            if (lastDeviceTheme && lastDeviceTheme !== currentDeviceTheme) {
+                savedTheme = currentDeviceTheme;
+                localStorage.setItem('stonebridge_theme', currentDeviceTheme);
+            } else if (!savedTheme) {
+                if (hasMedia && window.matchMedia('(prefers-color-scheme: light)').matches) {
+                    savedTheme = 'light';
+                } else if (hasMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+                    savedTheme = 'dark';
+                } else {
+                    savedTheme = '{{ $settings["default_theme"] ?? "dark" }}';
+                }
+            }
+            localStorage.setItem('stonebridge_last_device_theme', currentDeviceTheme);
             document.documentElement.setAttribute('data-theme', savedTheme);
+            const metaTheme = document.getElementById('metaThemeColor');
+            if (metaTheme) {
+                metaTheme.setAttribute('content', savedTheme === 'light' ? '#fbf8f3' : '#090c0f');
+            }
         })();
     </script>
 
@@ -126,7 +151,27 @@
             line-height: 1.6;
             -webkit-font-smoothing: antialiased;
             overflow-x: hidden;
-            transition: background-color 0.3s ease, color 0.3s ease;
+            width: 100%;
+            max-width: 100%;
+            position: relative;
+        }
+
+        /* Seamless Theme Color Flow Transitions */
+        html, body,
+        .site-header,
+        .header-logo,
+        .header-btn,
+        .theme-toggle-btn,
+        .modal-card,
+        .modal-overlay,
+        .modal-close,
+        .header-docs-btn,
+        .header-docs-menu,
+        .header-docs-menu a {
+            transition: background-color 0.4s cubic-bezier(0.4, 0, 0.2, 1),
+                        color 0.4s cubic-bezier(0.4, 0, 0.2, 1),
+                        border-color 0.4s cubic-bezier(0.4, 0, 0.2, 1),
+                        box-shadow 0.4s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
         /* Typography */
@@ -139,6 +184,8 @@
             top: 0;
             left: 0;
             width: 100%;
+            max-width: 100%;
+            box-sizing: border-box;
             z-index: 100;
             padding: 36px 64px;
             display: flex;
@@ -156,7 +203,7 @@
             display: flex;
             flex-direction: column;
             line-height: 1.25;
-            transition: color 0.3s ease;
+            transition: color 0.4s cubic-bezier(0.4, 0, 0.2, 1);
         }
         .header-logo span {
             font-size: 14px;
@@ -200,10 +247,13 @@
             padding: 8px 14px;
             display: inline-flex;
             align-items: center;
+            justify-content: center;
             gap: 7px;
             cursor: pointer;
             border-radius: 2px;
             transition: all 0.25s ease;
+            flex-shrink: 0;
+            box-sizing: border-box;
         }
         [data-theme="light"] .theme-toggle-btn {
             background: rgba(0, 0, 0, 0.04);
@@ -355,9 +405,91 @@
         }
 
         @media (max-width: 768px) {
-            .site-header { padding: 24px 24px; }
+            .site-header {
+                padding: 16px 18px;
+                gap: 8px;
+                width: 100%;
+                max-width: 100%;
+                box-sizing: border-box;
+                overflow: hidden;
+            }
+            .header-logo {
+                font-size: 13px;
+                letter-spacing: 0.16em;
+                flex-shrink: 1;
+                min-width: 0;
+            }
+            .header-logo span:last-child {
+                font-size: 11px;
+                letter-spacing: 0.2em;
+            }
+            .header-right {
+                gap: 8px;
+                flex-shrink: 0;
+            }
+            .theme-toggle-btn {
+                padding: 0 !important;
+                width: 34px !important;
+                height: 34px !important;
+                min-width: 34px !important;
+                justify-content: center !important;
+                border-radius: 3px;
+                flex-shrink: 0;
+            }
+            .theme-toggle-btn .theme-toggle-label {
+                display: none !important; /* Hide 'LIGHT'/'DARK' text on all mobile/tablet screens so button is a compact square icon, completely eliminating horizontal overflow */
+            }
+            .header-btn {
+                padding: 8px 14px;
+                font-size: 9.5px;
+                letter-spacing: 0.12em;
+                white-space: nowrap;
+            }
             .modal-card { padding: 28px 20px; }
             .header-docs-dropdown { display: none; }
+        }
+
+        @media (max-width: 420px) {
+            .site-header {
+                padding: 14px 14px;
+                gap: 6px;
+            }
+            .header-logo {
+                font-size: 12px;
+                letter-spacing: 0.12em;
+            }
+            .header-logo span:last-child {
+                font-size: 10px;
+                letter-spacing: 0.15em;
+            }
+            .header-right {
+                gap: 6px;
+            }
+            .theme-toggle-btn {
+                width: 32px !important;
+                height: 32px !important;
+                min-width: 32px !important;
+            }
+            .header-btn {
+                padding: 7px 11px;
+                font-size: 9px;
+                letter-spacing: 0.08em;
+            }
+        }
+
+        @media (max-width: 340px) {
+            .site-header {
+                padding: 12px 10px;
+                gap: 4px;
+            }
+            .header-logo {
+                font-size: 11px;
+                letter-spacing: 0.08em;
+            }
+            .header-btn {
+                padding: 6px 8px;
+                font-size: 8px;
+            }
         }
     </style>
     @yield('styles')
@@ -436,33 +568,66 @@
     </div>
 
     <script>
-        function toggleTheme() {
-            const currentTheme = document.documentElement.getAttribute('data-theme') || 'dark';
-            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+        function updateMetaThemeColor(theme) {
+            const metaTheme = document.getElementById('metaThemeColor') || document.querySelector('meta[name="theme-color"]');
+            if (metaTheme) {
+                metaTheme.setAttribute('content', theme === 'light' ? '#fbf8f3' : '#090c0f');
+            }
+        }
+
+        function applyTheme(newTheme, isManual = true) {
             document.documentElement.setAttribute('data-theme', newTheme);
             localStorage.setItem('stonebridge_theme', newTheme);
             updateThemeUI(newTheme);
-            window.dispatchEvent(new CustomEvent('themeChanged', { detail: { theme: newTheme } }));
+            updateMetaThemeColor(newTheme);
+            window.dispatchEvent(new CustomEvent('themeChanged', { detail: { theme: newTheme, isManual: isManual } }));
+        }
+
+        function toggleTheme() {
+            const currentTheme = document.documentElement.getAttribute('data-theme') || 'dark';
+            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            applyTheme(newTheme, true);
         }
 
         function updateThemeUI(theme) {
             const moon = document.querySelector('.theme-icon-moon');
             const sun = document.querySelector('.theme-icon-sun');
             const label = document.getElementById('themeToggleText');
+            const btn = document.getElementById('themeToggleBtn');
             if (theme === 'light') {
                 if (moon) moon.style.display = 'none';
                 if (sun) sun.style.display = 'block';
                 if (label) label.innerText = 'DARK';
+                if (btn) btn.setAttribute('title', 'Switch to Dark Theme');
             } else {
                 if (moon) moon.style.display = 'block';
                 if (sun) sun.style.display = 'none';
                 if (label) label.innerText = 'LIGHT';
+                if (btn) btn.setAttribute('title', 'Switch to Light Theme');
+            }
+        }
+
+        // Active Device OS Theme Synchronization
+        // When the user changes their mobile phone / device theme in phone settings,
+        // the website immediately flows into that theme in real-time!
+        if (window.matchMedia) {
+            const darkMediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+            const handleDeviceThemeChange = function(e) {
+                const newDeviceTheme = e.matches ? 'dark' : 'light';
+                localStorage.setItem('stonebridge_last_device_theme', newDeviceTheme);
+                applyTheme(newDeviceTheme, false);
+            };
+            if (darkMediaQuery.addEventListener) {
+                darkMediaQuery.addEventListener('change', handleDeviceThemeChange);
+            } else if (darkMediaQuery.addListener) {
+                darkMediaQuery.addListener(handleDeviceThemeChange);
             }
         }
 
         document.addEventListener('DOMContentLoaded', function() {
             const theme = document.documentElement.getAttribute('data-theme') || 'dark';
             updateThemeUI(theme);
+            updateMetaThemeColor(theme);
         });
 
         function openSubPage(slug) {

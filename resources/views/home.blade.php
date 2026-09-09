@@ -29,33 +29,70 @@
         display: flex;
         align-items: center;
         justify-content: center;
-        background-image: var(--hero-bg-image);
+        padding: 160px var(--section-px) var(--section-py) var(--section-px);
+        overflow: hidden;
+        width: 100%;
+        max-width: 100%;
+        box-sizing: border-box;
+    }
+    .hero-bg-dark,
+    .hero-bg-light {
+        position: absolute;
+        inset: 0;
         background-repeat: no-repeat;
         background-position: center center;
         background-size: cover;
-        padding: 160px var(--section-px) var(--section-py) var(--section-px);
-        transition: background-image 0.5s ease-in-out;
+        pointer-events: none;
+        transition: opacity 0.5s cubic-bezier(0.4, 0, 0.2, 1);
     }
-    .hero-vignette {
+    .hero-bg-dark {
+        background-image: url('{{ $settings["hero_image"] ?? "/images/hero-bridge-dark.jpg" }}');
+        opacity: 1;
+        z-index: 0;
+    }
+    .hero-bg-light {
+        background-image: url('{{ $settings["hero_image_light"] ?? "/images/hero-bridge-light.jpg" }}');
+        opacity: 0;
+        z-index: 0;
+    }
+    [data-theme="light"] .hero-bg-dark {
+        opacity: 0;
+    }
+    [data-theme="light"] .hero-bg-light {
+        opacity: 1;
+    }
+    .hero-vignette-dark,
+    .hero-vignette-light {
         position: absolute;
         inset: 0;
-        /* Atmospheric twilight blue sky & soft charcoal vignette as requested */
+        z-index: 1;
+        pointer-events: none;
+        transition: opacity 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .hero-vignette-dark {
+        /* Atmospheric twilight blue sky & soft charcoal vignette */
         background: radial-gradient(
             ellipse at 50% 28%,
             rgba(26, 40, 62, 0.42) 0%,
             rgba(11, 16, 22, 0.76) 55%,
             rgba(8, 11, 15, 0.96) 100%
         );
-        z-index: 1;
-        transition: background 0.4s ease;
+        opacity: 1;
     }
-    [data-theme="light"] .hero-vignette {
+    .hero-vignette-light {
         background: radial-gradient(
             ellipse at 50% 28%,
             rgba(235, 242, 248, 0.3) 0%,
             rgba(251, 248, 243, 0.68) 55%,
             rgba(251, 248, 243, 0.96) 100%
         );
+        opacity: 0;
+    }
+    [data-theme="light"] .hero-vignette-dark {
+        opacity: 0;
+    }
+    [data-theme="light"] .hero-vignette-light {
+        opacity: 1;
     }
     .hero-bottom-grad {
         position: absolute;
@@ -66,6 +103,7 @@
         background: linear-gradient(to bottom, transparent, var(--bg-dark));
         z-index: 2;
         pointer-events: none;
+        transition: background 0.4s cubic-bezier(0.4, 0, 0.2, 1);
     }
     .hero-inner {
         position: relative;
@@ -678,6 +716,79 @@
     }
 
     /* ==========================================================================
+       SEAMLESS THEME COLOR FLOW TRANSITIONS
+       ========================================================================== */
+    .hero-wrap,
+    .hero-title,
+    .btn-hero-inquiry,
+    .mandate-wrap,
+    .mandate-inner,
+    .mandate-badge,
+    .mandate-lead,
+    .mandate-secondary,
+    .approach-wrap,
+    .approach-header-col,
+    .approach-heading,
+    .pillar-item,
+    .pillar-name,
+    .pillar-body,
+    .pillar-icon-box,
+    .pillar-icon-box svg,
+    .serves-wrap,
+    .serves-heading,
+    .serves-disclaimer-row,
+    .serves-disclaimer-col-left,
+    .serves-disclaimer-col-right,
+    .serves-small-divider,
+    .serves-footer-note,
+    .tag-gold,
+    .tag-bronze,
+    .section-accent-line,
+    .criterion-row,
+    .criterion-label,
+    .circle-check,
+    .circle-check svg,
+    .retainer-wrap,
+    .retainer-content-side,
+    .retainer-heading,
+    .retainer-sub-intro,
+    .retainer-ul,
+    .retainer-ul li,
+    .retainer-fee-note,
+    .founder-wrap,
+    .founder-card-half,
+    .founder-name-heading,
+    .founder-narrative,
+    .inquiry-wrap,
+    .inquiry-heading,
+    .inquiry-text,
+    .floating-input,
+    .floating-label,
+    .lock-notice,
+    .lock-notice svg,
+    .btn-form-submit,
+    .footer-wrap,
+    .footer-logo,
+    .footer-tagline-text,
+    .footer-right-links,
+    .footer-right-links a {
+        transition: background-color 0.4s cubic-bezier(0.4, 0, 0.2, 1),
+                    color 0.4s cubic-bezier(0.4, 0, 0.2, 1),
+                    border-color 0.4s cubic-bezier(0.4, 0, 0.2, 1),
+                    box-shadow 0.4s cubic-bezier(0.4, 0, 0.2, 1),
+                    fill 0.4s cubic-bezier(0.4, 0, 0.2, 1),
+                    stroke 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    /* Standardized Zero Horizontal Overflow Container Styles */
+    .hero-wrap, .mandate-wrap, .approach-wrap, .serves-wrap, .retainer-wrap, .founder-wrap, .inquiry-wrap, .footer-wrap {
+        width: 100%;
+        max-width: 100%;
+        box-sizing: border-box;
+        overflow-x: hidden;
+    }
+
+    /* ==========================================================================
        RESPONSIVE DESIGN (Precise Mobile Layout Balance)
        ========================================================================== */
     @media (max-width: 1100px) {
@@ -715,7 +826,7 @@
         .founder-card-half { padding: var(--section-py) var(--section-px); }
         .inquiry-flex { grid-template-columns: 1fr; gap: 36px; }
         .inquiry-row-3 { grid-template-columns: 1fr; }
-        .footer-content { flex-direction: column; gap: 16px; text-align: center; }
+        .footer-content { display: flex; flex-direction: column; gap: 16px; text-align: center; }
         .footer-logo, .footer-tagline-text, .footer-right-links { text-align: center; justify-content: center; }
     }
     @media (max-width: 768px) {
@@ -723,6 +834,8 @@
         .retainer-offerings-grid {
             grid-template-columns: 1fr;
             gap: 0;
+            width: 100%;
+            box-sizing: border-box;
         }
         .retainer-ul li {
             font-size: 14px;
@@ -753,7 +866,10 @@
          1. HERO SECTION (Minimalist Monumental Stone Bridge)
          ========================================================================= -->
     <section class="hero-wrap" id="hero">
-        <div class="hero-vignette"></div>
+        <div class="hero-bg-dark"></div>
+        <div class="hero-bg-light"></div>
+        <div class="hero-vignette-dark"></div>
+        <div class="hero-vignette-light"></div>
         <div class="hero-bottom-grad"></div>
 
         <div class="hero-inner">
