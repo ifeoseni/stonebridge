@@ -281,9 +281,6 @@
         font-weight: 400;
     }
     .serves-disclaimer-row {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        column-gap: 40px;
         margin-top: 28px;
     }
     .serves-disclaimer-col-left {
@@ -589,10 +586,13 @@
         .pillars-row { grid-template-columns: repeat(2, 1fr); }
         .serves-flex { grid-template-columns: 1fr; gap: 32px; }
         .criteria-2col { grid-template-columns: 1fr; }
-        .serves-disclaimer-row { grid-template-columns: 1fr; margin-top: 24px; }
-        .serves-disclaimer-row > div:first-child { display: none; }
+        .serves-disclaimer-row { margin-top: 24px; }
+        .serves-disclaimer-col-left { align-items: center; text-align: center; }
+        .serves-small-divider { margin: 0 auto 12px auto; }
+        .serves-footer-note { text-align: center; margin: 0 auto; }
         .retainer-wrap { grid-template-columns: 1fr; }
-        .retainer-photo-side { min-height: 380px; }
+        .retainer-photo-side { min-height: 320px; order: 1; }
+        .retainer-content-side { order: 2; }
         .founder-wrap { grid-template-columns: 1fr; }
         .founder-photo-half { min-height: 400px; }
         .inquiry-flex { grid-template-columns: 1fr; gap: 36px; }
@@ -709,7 +709,6 @@
                 </div>
 
                 <div class="serves-disclaimer-row">
-                    <div></div>
                     <div class="serves-disclaimer-col-left">
                         <div class="serves-small-divider"></div>
                         <div class="serves-footer-note">
