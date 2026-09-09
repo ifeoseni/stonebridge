@@ -39,13 +39,18 @@ class ContentController extends Controller
      */
     public function updateSettings(Request $request)
     {
-        $data = $request->except(['_token', '_method', 'tab', 'hero_image_file', 'retainer_image_file', 'founder_image_file']);
+        $data = $request->except(['_token', '_method', 'tab', 'hero_image_file', 'hero_image_light_file', 'retainer_image_file', 'founder_image_file']);
         $tab = $request->input('tab', 'hero');
 
         // Handle image uploads
         if ($request->hasFile('hero_image_file')) {
             $path = $request->file('hero_image_file')->store('uploads', 'public');
-            SiteSetting::set('hero_image', '/storage/' . $path, 'hero', 'Hero Background Image', 'image');
+            SiteSetting::set('hero_image', '/storage/' . $path, 'hero', 'Hero Background Image (Dark Theme)', 'image');
+        }
+
+        if ($request->hasFile('hero_image_light_file')) {
+            $path = $request->file('hero_image_light_file')->store('uploads', 'public');
+            SiteSetting::set('hero_image_light', '/storage/' . $path, 'hero', 'Hero Background Image (Light Theme)', 'image');
         }
 
         if ($request->hasFile('retainer_image_file')) {

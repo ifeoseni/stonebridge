@@ -3,71 +3,126 @@
 @section('styles')
 <style>
     /* ==========================================================================
-       SECTION 1: HERO (Atmospheric River & Stone Bridge)
+       THEME DYNAMIC VARIABLES & BACKGROUNDS
+       ========================================================================== */
+    :root {
+        --hero-bg-image: url('{{ $settings["hero_image"] ?? "/images/hero-bridge-dark.jpg" }}');
+    }
+    [data-theme="light"] {
+        --hero-bg-image: url('{{ $settings["hero_image_light"] ?? "/images/hero-bridge-light.jpg" }}');
+    }
+
+    /* Standardized Section Padding Across All Blocks */
+    .section-standard-padding {
+        padding-top: var(--section-py);
+        padding-bottom: var(--section-py);
+        padding-left: var(--section-px);
+        padding-right: var(--section-px);
+    }
+
+    /* ==========================================================================
+       SECTION 1: HERO (Atmospheric Stone Bridge & Minimalist Center Stage)
        ========================================================================== */
     .hero-wrap {
         position: relative;
         min-height: 100vh;
         display: flex;
         align-items: center;
-        background: #090b0d url('{{ $settings["hero_image"] ?? "/images/hero-bridge.jpg" }}') no-repeat center right / cover;
-        padding: 160px 64px 100px 64px;
+        justify-content: center;
+        background-image: var(--hero-bg-image);
+        background-repeat: no-repeat;
+        background-position: center center;
+        background-size: cover;
+        padding: 160px var(--section-px) var(--section-py) var(--section-px);
+        transition: background-image 0.5s ease-in-out;
     }
     .hero-vignette {
         position: absolute;
         inset: 0;
-        background: linear-gradient(
-            to right,
-            rgba(7, 9, 11, 0.96) 0%,
-            rgba(7, 9, 11, 0.88) 38%,
-            rgba(7, 9, 11, 0.5) 65%,
-            rgba(7, 9, 11, 0.25) 100%
+        /* Atmospheric twilight blue sky & soft charcoal vignette as requested */
+        background: radial-gradient(
+            ellipse at 50% 28%,
+            rgba(26, 40, 62, 0.42) 0%,
+            rgba(11, 16, 22, 0.76) 55%,
+            rgba(8, 11, 15, 0.96) 100%
         );
         z-index: 1;
+        transition: background 0.4s ease;
+    }
+    [data-theme="light"] .hero-vignette {
+        background: radial-gradient(
+            ellipse at 50% 28%,
+            rgba(235, 242, 248, 0.3) 0%,
+            rgba(251, 248, 243, 0.68) 55%,
+            rgba(251, 248, 243, 0.96) 100%
+        );
     }
     .hero-bottom-grad {
         position: absolute;
         bottom: 0;
         left: 0;
         width: 100%;
-        height: 140px;
-        background: linear-gradient(to bottom, transparent, #0c0e10);
+        height: 160px;
+        background: linear-gradient(to bottom, transparent, var(--bg-dark));
         z-index: 2;
+        pointer-events: none;
     }
     .hero-inner {
         position: relative;
         z-index: 10;
-        max-width: 560px;
+        max-width: 680px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
     }
     .hero-title {
         font-family: var(--font-serif);
-        font-size: 58px;
+        font-size: clamp(40px, 6.2vw, 68px);
         font-weight: 300;
-        letter-spacing: 0.08em;
-        line-height: 1.1;
-        color: #f6f3eb;
+        letter-spacing: 0.12em;
+        line-height: 1.15;
+        color: #f7f4ed;
         text-transform: uppercase;
-        margin-bottom: 28px;
+        margin-bottom: 36px;
+        text-shadow: 0 4px 28px rgba(0, 0, 0, 0.75);
     }
-    .hero-lead-text {
-        font-family: var(--font-sans);
-        font-size: 14.5px;
-        line-height: 1.75;
-        color: #bec3c7;
-        margin-bottom: 20px;
-        font-weight: 300;
+    [data-theme="light"] .hero-title {
+        color: #211c17;
+        text-shadow: 0 2px 24px rgba(255, 255, 255, 0.85);
     }
-    .hero-invitation-badge {
+    .btn-hero-inquiry {
+        display: inline-block;
+        background: rgba(14, 18, 22, 0.45);
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        color: var(--gold-accent) !important;
         font-family: var(--font-sans);
-        font-size: 10px;
-        letter-spacing: 0.22em;
-        color: var(--gold-accent);
-        text-transform: uppercase;
+        font-size: 11px;
         font-weight: 600;
-        margin: 28px 0 28px;
-        display: block;
+        letter-spacing: 0.22em;
+        text-transform: uppercase;
+        padding: 14px 36px;
+        text-decoration: none;
+        border: 1px solid var(--gold-accent) !important;
+        border-radius: 2px;
+        cursor: pointer;
+        transition: all 0.25s ease;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
     }
-    /* Refined Architectural Accent Lines matching Reference Screenshot */
+    [data-theme="light"] .btn-hero-inquiry {
+        background: rgba(255, 255, 255, 0.85);
+        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+    }
+    .btn-hero-inquiry:hover {
+        background: var(--gold-btn) !important;
+        color: #171513 !important;
+        border-color: var(--gold-btn) !important;
+        box-shadow: 0 6px 26px rgba(191, 161, 118, 0.4);
+        transform: translateY(-1px);
+    }
+
+    /* Refined Architectural Accent Lines */
     .section-accent-line {
         width: 46px;
         height: 1.5px;
@@ -81,71 +136,69 @@
     .section-accent-line.bronze {
         background-color: #9c8360;
     }
-    .serves-small-divider {
-        width: 32px;
-        height: 1px;
-        background-color: rgba(40, 35, 30, 0.2);
-        margin: 32px 0 16px 0;
-        display: block;
-    }
 
-    .btn-gold-box, .btn-gold-solid {
-        display: inline-block;
-        background: transparent !important;
-        color: var(--gold-accent) !important;
+    /* ==========================================================================
+       SECTION 1.5: THE STONEBRIDGE MANDATE (Subtext Architectural Placement)
+       ========================================================================== */
+    .mandate-wrap {
+        background-color: var(--bg-dark);
+        border-bottom: 1px solid var(--border-subtle);
+        text-align: center;
+        display: flex;
+        justify-content: center;
+        padding: var(--section-py) var(--section-px);
+        transition: background-color 0.3s ease;
+    }
+    .mandate-inner {
+        max-width: 680px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+    .mandate-badge {
         font-family: var(--font-sans);
-        font-size: 11px;
-        font-weight: 500;
-        letter-spacing: 0.2em;
+        font-size: 10.5px;
+        letter-spacing: 0.25em;
+        color: var(--gold-accent);
         text-transform: uppercase;
-        padding: 11px 26px;
-        text-decoration: none;
-        border: 1px solid var(--gold-accent) !important;
-        cursor: pointer;
-        transition: all 0.25s ease;
-    }
-    .btn-gold-box:hover, .btn-gold-solid:hover {
-        background: rgba(191, 161, 118, 0.12) !important;
-        color: #dfc8a5 !important;
-        border-color: #dfc8a5 !important;
-    }
-
-    .btn-form-submit {
-        display: inline-block;
-        background: var(--gold-btn);
-        color: #171513;
-        font-family: var(--font-sans);
-        font-size: 11px;
         font-weight: 600;
-        letter-spacing: 0.2em;
-        text-transform: uppercase;
-        padding: 13px 26px;
-        text-decoration: none;
-        border: 1px solid var(--gold-accent);
-        cursor: pointer;
-        transition: all 0.25s ease;
+        margin-bottom: 14px;
     }
-    .btn-form-submit:hover {
-        background: var(--gold-btn-hover);
-        color: #000;
+    .mandate-lead {
+        font-family: var(--font-serif);
+        font-size: 24px;
+        line-height: 1.5;
+        color: var(--text-white);
+        font-weight: 400;
+        margin-bottom: 16px;
+    }
+    .mandate-secondary {
+        font-family: var(--font-sans);
+        font-size: 14.5px;
+        line-height: 1.75;
+        color: var(--text-light-muted);
+        font-weight: 300;
+        max-width: 540px;
     }
 
     /* ==========================================================================
-       SECTION 2: THE STONEBRIDGE APPROACH (Dark 5-column horizontal row)
+       SECTION 2: THE STONEBRIDGE APPROACH (5 Pillars)
        ========================================================================== */
     .approach-wrap {
         background-color: var(--bg-approach);
-        padding: 70px 64px 85px 64px;
+        padding: var(--section-py) var(--section-px);
+        border-bottom: 1px solid var(--border-subtle);
+        transition: background-color 0.3s ease;
     }
     .approach-flex {
         display: grid;
-        grid-template-columns: 240px 1fr;
+        grid-template-columns: 260px 1fr;
         gap: 0;
         align-items: start;
     }
     .approach-header-col {
-        padding-right: 32px;
-        border-right: 1px solid rgba(255, 255, 255, 0.08);
+        padding-right: 36px;
+        border-right: 1px solid var(--border-dark);
     }
     .tag-gold {
         font-family: var(--font-sans);
@@ -162,7 +215,7 @@
         font-size: 34px;
         font-weight: 300;
         line-height: 1.25;
-        color: #f7f4ed;
+        color: var(--text-white);
     }
     .pillars-row {
         display: grid;
@@ -174,8 +227,8 @@
         display: flex;
         flex-direction: column;
         align-items: flex-start;
-        padding: 0 12px;
-        border-right: 1px solid rgba(255, 255, 255, 0.08);
+        padding: 0 16px;
+        border-right: 1px solid var(--border-dark);
         min-width: 0;
     }
     .pillar-item:last-child {
@@ -195,28 +248,30 @@
     }
     .pillar-name {
         font-family: var(--font-sans);
-        font-size: 11.5px;
+        font-size: 12px;
         font-weight: 600;
         letter-spacing: 0.01em;
-        color: #f5f3ee;
+        color: var(--text-white);
         margin-bottom: 8px;
         white-space: nowrap;
     }
     .pillar-body {
         font-family: var(--font-sans);
-        font-size: 11.5px;
+        font-size: 12px;
         line-height: 1.6;
-        color: #888e94;
+        color: var(--text-light-muted);
         font-weight: 300;
     }
 
     /* ==========================================================================
-       SECTION 3: WHO STONEBRIDGE SERVES (Pure Cream #f4ede4 Background)
+       SECTION 3: WHO STONEBRIDGE SERVES (Warm Cream Background)
        ========================================================================== */
     .serves-wrap {
         background-color: var(--bg-cream);
         color: var(--text-dark);
-        padding: 95px 64px 85px 64px;
+        padding: var(--section-py) var(--section-px);
+        border-bottom: 1px solid var(--border-subtle);
+        transition: background-color 0.3s ease;
     }
     .serves-flex {
         display: grid;
@@ -245,12 +300,15 @@
         display: grid;
         grid-template-columns: 1fr 1fr;
         column-gap: 40px;
+        row-gap: 22px;
         align-items: start;
     }
     .criteria-col-left, .criteria-col-right {
         display: flex;
         flex-direction: column;
         gap: 22px;
+        margin: 0;
+        padding: 0;
     }
     .criterion-row {
         display: flex;
@@ -304,21 +362,22 @@
         font-size: 13px;
         line-height: 1.45;
         color: #8c8275;
-        max-width: 290px;
+        max-width: 320px;
         margin: 0;
     }
 
     /* ==========================================================================
-       SECTION 4: RETAINER RELATIONSHIPS (Dark & Still Life)
-       ========================================================================= */
+       SECTION 4: RETAINER RELATIONSHIPS
+       ========================================================================== */
     .retainer-wrap {
-        background-color: #0d0f11;
+        background-color: var(--bg-dark-section);
         display: grid;
-        grid-template-columns: 46% 54%;
-        border-top: 1px solid rgba(255, 255, 255, 0.06);
+        grid-template-columns: 48% 52%;
+        border-bottom: 1px solid var(--border-subtle);
+        transition: background-color 0.3s ease;
     }
     .retainer-content-side {
-        padding: 85px 56px 85px 64px;
+        padding: var(--section-py) var(--section-px);
         display: flex;
         flex-direction: column;
         justify-content: center;
@@ -328,7 +387,7 @@
         font-size: 34px;
         font-weight: 300;
         line-height: 1.25;
-        color: #f7f4ed;
+        color: var(--text-white);
         margin-bottom: 28px;
     }
     .retainer-sub-intro {
@@ -340,23 +399,24 @@
         margin-bottom: 20px;
         font-weight: 500;
     }
-    .retainer-2col-list {
+    .retainer-offerings-grid {
         display: grid;
         grid-template-columns: 1fr 1fr;
-        gap: 28px;
+        gap: 24px;
         margin-bottom: 32px;
     }
     .retainer-ul {
         list-style: none;
+        padding-left: 0;
     }
     .retainer-ul li {
         font-family: var(--font-sans);
         font-size: 13.5px;
-        color: #afb5ba;
-        margin-bottom: 10px;
+        color: var(--text-light-muted);
+        margin-bottom: 12px;
         position: relative;
-        padding-left: 14px;
-        line-height: 1.45;
+        padding-left: 16px;
+        line-height: 1.5;
         font-weight: 300;
     }
     .retainer-ul li::before {
@@ -364,7 +424,8 @@
         position: absolute;
         left: 0;
         color: var(--gold-accent);
-        font-size: 12px;
+        font-size: 13px;
+        top: -1px;
     }
     .retainer-fee-note {
         font-family: var(--font-serif);
@@ -373,11 +434,12 @@
         color: var(--gold-accent);
         font-style: italic;
         margin-top: 24px;
-        max-width: 360px;
+        max-width: 380px;
     }
     .retainer-photo-side {
         position: relative;
         background: #000;
+        min-height: 480px;
     }
     .retainer-photo-side img {
         width: 100%;
@@ -387,16 +449,19 @@
     }
 
     /* ==========================================================================
-       SECTION 5: CARL MALMSTEN (50% Photo + 50% Cream Card)
+       SECTION 5: CARL MALMSTEN (Founder Portrait & Narrative)
        ========================================================================== */
     .founder-wrap {
         display: grid;
         grid-template-columns: 44% 56%;
         background-color: var(--bg-cream);
+        border-bottom: 1px solid var(--border-subtle);
+        transition: background-color 0.3s ease;
     }
     .founder-photo-half {
         position: relative;
         background-color: #000;
+        min-height: 480px;
     }
     .founder-photo-half img {
         width: 100%;
@@ -408,7 +473,7 @@
     .founder-card-half {
         background-color: var(--bg-cream);
         color: var(--text-dark);
-        padding: 95px 72px;
+        padding: var(--section-py) var(--section-px);
         display: flex;
         flex-direction: column;
         justify-content: center;
@@ -434,12 +499,13 @@
     }
 
     /* ==========================================================================
-       SECTION 6: PRIVATE INQUIRY
+       SECTION 6: PRIVATE INQUIRY (High Contrast Floating Labels)
        ========================================================================== */
     .inquiry-wrap {
-        background-color: #080a0c;
-        padding: 100px 64px 80px 64px;
-        border-top: 1px solid rgba(255, 255, 255, 0.06);
+        background-color: var(--bg-dark);
+        padding: var(--section-py) var(--section-px);
+        border-bottom: 1px solid var(--border-subtle);
+        transition: background-color 0.3s ease;
     }
     .inquiry-flex {
         display: grid;
@@ -452,48 +518,76 @@
         font-size: 36px;
         font-weight: 300;
         line-height: 1.22;
-        color: #f7f4ed;
+        color: var(--text-white);
         margin-bottom: 22px;
     }
     .inquiry-text {
         font-family: var(--font-sans);
         font-size: 14px;
         line-height: 1.75;
-        color: #8f969d;
+        color: var(--text-light-muted);
         margin-bottom: 16px;
         font-weight: 300;
     }
 
-    /* The Inquiry Form Elements */
+    /* Modern Floating Label Form Controls */
     .inquiry-form-wrapper {
         display: flex;
         flex-direction: column;
-        gap: 14px;
+        gap: 16px;
     }
     .inquiry-row-3 {
         display: grid;
         grid-template-columns: 1fr 1fr 1fr;
         gap: 14px;
     }
-    .inquiry-input {
+    .form-floating-group {
+        position: relative;
         width: 100%;
-        background-color: #0f1215;
-        border: 1px solid rgba(255, 255, 255, 0.12);
-        color: #f0ece3;
-        padding: 12px 14px;
+    }
+    .floating-input {
+        width: 100%;
+        height: 52px;
+        padding: 20px 14px 6px 14px;
+        background-color: var(--input-bg);
+        border: 1px solid var(--border-input);
+        color: var(--input-text);
         font-family: var(--font-sans);
         font-size: 13.5px;
         outline: none;
-        transition: border-color 0.2s;
+        border-radius: 2px;
+        transition: all 0.25s ease;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
     }
-    .inquiry-input::placeholder {
-        color: #5c6268;
-        font-weight: 300;
+    .floating-label {
+        position: absolute;
+        left: 14px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: var(--input-label);
+        font-family: var(--font-sans);
+        font-size: 13px;
+        pointer-events: none;
+        transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        font-weight: 400;
+        letter-spacing: 0.02em;
     }
-    .inquiry-input:focus {
+    .floating-input:focus,
+    .floating-input:not(:placeholder-shown) {
+        background-color: var(--input-bg-focus);
         border-color: var(--gold-accent);
-        background-color: #13171b;
+        box-shadow: 0 0 0 2px var(--gold-subtle);
     }
+    .floating-input:focus ~ .floating-label,
+    .floating-input:not(:placeholder-shown) ~ .floating-label {
+        top: 13px;
+        font-size: 9.5px;
+        font-weight: 600;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+        color: var(--gold-accent);
+    }
+
     .inquiry-footer-row {
         display: flex;
         align-items: center;
@@ -505,30 +599,52 @@
         align-items: center;
         gap: 8px;
         font-size: 12.5px;
-        color: #727980;
+        color: var(--text-light-muted);
     }
     .lock-notice svg {
         color: var(--gold-accent);
     }
+    .btn-form-submit {
+        display: inline-block;
+        background: var(--gold-btn);
+        color: #171513;
+        font-family: var(--font-sans);
+        font-size: 11px;
+        font-weight: 600;
+        letter-spacing: 0.2em;
+        text-transform: uppercase;
+        padding: 13px 28px;
+        text-decoration: none;
+        border: 1px solid var(--gold-accent);
+        border-radius: 2px;
+        cursor: pointer;
+        transition: all 0.25s ease;
+    }
+    .btn-form-submit:hover {
+        background: var(--gold-btn-hover);
+        color: #000;
+        box-shadow: 0 4px 16px var(--gold-subtle);
+    }
     .alert-inquiry {
         padding: 14px;
         border: 1px solid var(--gold-accent);
-        background: rgba(191, 161, 118, 0.08);
-        color: var(--gold-accent);
+        background: var(--gold-subtle);
+        color: var(--gold-text);
         font-size: 13.5px;
         margin-bottom: 16px;
         display: none;
+        border-radius: 2px;
     }
 
     /* ==========================================================================
        SECTION 7: FOOTER
        ========================================================================== */
     .footer-wrap {
-        background-color: #060708;
-        padding: 34px 64px;
-        border-top: 1px solid rgba(255, 255, 255, 0.06);
+        background-color: var(--bg-dark-section);
+        padding: 40px 64px;
         font-size: 12px;
-        color: #636a71;
+        color: var(--text-light-muted);
+        transition: background-color 0.3s ease;
     }
     .footer-content {
         display: grid;
@@ -541,7 +657,7 @@
         font-size: 13px;
         letter-spacing: 0.22em;
         text-transform: uppercase;
-        color: #d1ccc2;
+        color: var(--text-white);
         text-align: left;
     }
     .footer-tagline-text {
@@ -556,26 +672,20 @@
         align-items: center;
         justify-content: flex-end;
         gap: 16px;
-        color: #555b62;
+        color: var(--text-light-muted);
         font-size: 11.5px;
         text-align: right;
     }
-    .footer-right-links a {
-        color: #636a71;
-        text-decoration: none;
-        transition: color 0.2s;
-    }
-    .footer-right-links a:hover {
-        color: var(--gold-accent);
-    }
 
-    /* Responsive */
+    /* ==========================================================================
+       RESPONSIVE DESIGN (Precise Mobile Layout Balance)
+       ========================================================================== */
     @media (max-width: 1100px) {
         .approach-header-col { border-right: none; padding-right: 0; margin-bottom: 32px; }
         .approach-flex { grid-template-columns: 1fr; gap: 32px; }
-        .pillars-row { grid-template-columns: repeat(3, 1fr); padding-left: 0; }
-        .pillar-item { padding: 14px; border-right: none; border-bottom: 1px solid rgba(255, 255, 255, 0.06); }
-        .hero-wrap, .approach-wrap, .serves-wrap, .retainer-content-side, .founder-card-half, .inquiry-wrap, .footer-wrap {
+        .pillars-row { grid-template-columns: repeat(3, 1fr); gap: 18px; }
+        .pillar-item { padding: 14px; border-right: none; border-bottom: 1px solid var(--border-dark); }
+        .hero-wrap, .mandate-wrap, .approach-wrap, .serves-wrap, .retainer-content-side, .founder-card-half, .inquiry-wrap, .footer-wrap {
             padding-left: 36px;
             padding-right: 36px;
         }
@@ -585,28 +695,54 @@
         .approach-flex { grid-template-columns: 1fr; gap: 32px; }
         .pillars-row { grid-template-columns: repeat(2, 1fr); }
         .serves-flex { grid-template-columns: 1fr; gap: 32px; }
-        .criteria-2col { grid-template-columns: 1fr; }
+        .criteria-2col {
+            display: flex;
+            flex-direction: column;
+            gap: 22px;
+        }
+        .criteria-col-left, .criteria-col-right {
+            display: contents;
+        }
         .serves-disclaimer-row { margin-top: 24px; }
         .serves-disclaimer-col-left { align-items: center; text-align: center; }
         .serves-small-divider { margin: 0 auto 12px auto; }
         .serves-footer-note { text-align: center; margin: 0 auto; }
         .retainer-wrap { grid-template-columns: 1fr; }
         .retainer-photo-side { min-height: 320px; order: 1; }
-        .retainer-content-side { order: 2; }
+        .retainer-content-side { order: 2; padding: var(--section-py) var(--section-px); }
         .founder-wrap { grid-template-columns: 1fr; }
-        .founder-photo-half { min-height: 400px; }
+        .founder-photo-half { min-height: 380px; }
+        .founder-card-half { padding: var(--section-py) var(--section-px); }
         .inquiry-flex { grid-template-columns: 1fr; gap: 36px; }
         .inquiry-row-3 { grid-template-columns: 1fr; }
         .footer-content { flex-direction: column; gap: 16px; text-align: center; }
+        .footer-logo, .footer-tagline-text, .footer-right-links { text-align: center; justify-content: center; }
+    }
+    @media (max-width: 768px) {
+        /* Mobile Stacked Retainer Offerings - Clean Vertical List avoiding short line wraps */
+        .retainer-offerings-grid {
+            grid-template-columns: 1fr;
+            gap: 0;
+        }
+        .retainer-ul li {
+            font-size: 14px;
+            line-height: 1.6;
+            margin-bottom: 14px;
+            padding-left: 20px;
+        }
+        .mandate-lead {
+            font-size: 20px;
+        }
     }
     @media (max-width: 600px) {
-        .hero-title { font-size: 42px; }
+        .hero-title { font-size: 38px; letter-spacing: 0.08em; }
         .pillars-row { grid-template-columns: 1fr; }
-        .hero-wrap, .approach-wrap, .serves-wrap, .retainer-content-side, .founder-card-half, .inquiry-wrap, .footer-wrap {
-            padding-left: 20px;
-            padding-right: 20px;
+        .hero-wrap, .mandate-wrap, .approach-wrap, .serves-wrap, .retainer-content-side, .founder-card-half, .inquiry-wrap, .footer-wrap {
+            padding-left: 22px;
+            padding-right: 22px;
         }
-        .inquiry-footer-row { flex-direction: column-reverse; gap: 16px; align-items: stretch; text-align: center; }
+        .inquiry-footer-row { flex-direction: column-reverse; gap: 18px; align-items: stretch; text-align: center; }
+        .btn-form-submit { width: 100%; text-align: center; }
     }
 </style>
 @endsection
@@ -614,7 +750,7 @@
 @section('content')
 
     <!-- =========================================================================
-         1. HERO SECTION
+         1. HERO SECTION (Minimalist Monumental Stone Bridge)
          ========================================================================= -->
     <section class="hero-wrap" id="hero">
         <div class="hero-vignette"></div>
@@ -622,24 +758,31 @@
 
         <div class="hero-inner">
             <h1 class="hero-title">{!! nl2br(e($settings['hero_title'] ?? "STONEBRIDGE\nADVISORY")) !!}</h1>
-            <div class="section-accent-line gold"></div>
-
-            <p class="hero-lead-text">
-                {{ $settings['hero_lead_1'] ?? 'Confidential advisory relationships for individuals navigating complex personal, relational, family, and leadership demands.' }}
-            </p>
-            <p class="hero-lead-text">
-                {{ $settings['hero_lead_2'] ?? 'Supporting those whose circumstances call for continuity, discretion, and thoughtful guidance.' }}
-            </p>
-
-            <span class="hero-invitation-badge">
-                {{ $settings['hero_badge'] ?? 'BY REFERRAL AND LIMITED INVITATION.' }}
-            </span>
 
             <div>
-                <a href="{{ $settings['hero_cta_link'] ?? '#private-inquiry' }}" class="btn-gold-solid">
+                <a href="{{ $settings['hero_cta_link'] ?? '#private-inquiry' }}" class="btn-hero-inquiry">
                     {{ $settings['hero_cta_text'] ?? 'PRIVATE INQUIRY' }}
                 </a>
             </div>
+        </div>
+    </section>
+
+    <!-- =========================================================================
+         1.5. THE STONEBRIDGE MANDATE & INVITATION (Subtext Architectural Band)
+         ========================================================================= -->
+    <section class="mandate-wrap" id="mandate">
+        <div class="mandate-inner">
+            <span class="mandate-badge">
+                {{ $settings['hero_badge'] ?? 'BY REFERRAL AND LIMITED INVITATION.' }}
+            </span>
+            <div class="section-accent-line gold" style="margin:0 auto 24px auto;"></div>
+
+            <p class="mandate-lead">
+                {{ $settings['hero_lead_1'] ?? 'Confidential advisory relationships for individuals navigating complex personal, relational, family, and leadership demands.' }}
+            </p>
+            <p class="mandate-secondary">
+                {{ $settings['hero_lead_2'] ?? 'Supporting those whose circumstances call for continuity, discretion, and thoughtful guidance.' }}
+            </p>
         </div>
     </section>
 
@@ -721,7 +864,7 @@
     </section>
 
     <!-- =========================================================================
-         4. RETAINER RELATIONSHIPS
+         4. RETAINER RELATIONSHIPS (Balanced List Stack on Mobile)
          ========================================================================= -->
     <section class="retainer-wrap" id="retainers">
         <div class="retainer-content-side">
@@ -731,7 +874,7 @@
 
             <div class="retainer-sub-intro">{{ $settings['retainer_intro'] ?? 'Engagements may include:' }}</div>
 
-            <div class="retainer-2col-list">
+            <div class="retainer-offerings-grid">
                 <ul class="retainer-ul">
                     @foreach($retainerLeft as $item)
                         <li>{{ $item->title }}</li>
@@ -774,7 +917,7 @@
     </section>
 
     <!-- =========================================================================
-         6. PRIVATE INQUIRY
+         6. PRIVATE INQUIRY (High Contrast Floating Labels)
          ========================================================================= -->
     <section class="inquiry-wrap" id="private-inquiry">
         <div class="inquiry-flex">
@@ -793,14 +936,29 @@
                     @csrf
 
                     <div class="inquiry-row-3">
-                        <input type="text" name="full_name" class="inquiry-input" placeholder="{{ $settings['inquiry_placeholder_name'] ?? 'Full Name' }}" required>
-                        <input type="email" name="email" class="inquiry-input" placeholder="{{ $settings['inquiry_placeholder_email'] ?? 'Email Address' }}" required>
-                        <input type="tel" name="phone" class="inquiry-input" placeholder="{{ $settings['inquiry_placeholder_phone'] ?? 'Phone Number' }}">
+                        <div class="form-floating-group">
+                            <input type="text" name="full_name" id="inq_full_name" class="floating-input" placeholder=" " required>
+                            <label for="inq_full_name" class="floating-label">{{ $settings['inquiry_placeholder_name'] ?? 'Full Name' }}</label>
+                        </div>
+                        <div class="form-floating-group">
+                            <input type="email" name="email" id="inq_email" class="floating-input" placeholder=" " required>
+                            <label for="inq_email" class="floating-label">{{ $settings['inquiry_placeholder_email'] ?? 'Email Address' }}</label>
+                        </div>
+                        <div class="form-floating-group">
+                            <input type="tel" name="phone" id="inq_phone" class="floating-input" placeholder=" ">
+                            <label for="inq_phone" class="floating-label">{{ $settings['inquiry_placeholder_phone'] ?? 'Phone Number' }}</label>
+                        </div>
                     </div>
 
-                    <input type="text" name="circumstances" class="inquiry-input" placeholder="{{ $settings['inquiry_placeholder_circumstances'] ?? 'Brief description of your circumstances' }}" required>
+                    <div class="form-floating-group">
+                        <input type="text" name="circumstances" id="inq_circumstances" class="floating-input" placeholder=" " required>
+                        <label for="inq_circumstances" class="floating-label">{{ $settings['inquiry_placeholder_circumstances'] ?? 'Brief description of your circumstances' }}</label>
+                    </div>
 
-                    <input type="text" name="motivation" class="inquiry-input" placeholder="{{ $settings['inquiry_placeholder_motivation'] ?? 'What led you to explore this type of relationship?' }}">
+                    <div class="form-floating-group">
+                        <input type="text" name="motivation" id="inq_motivation" class="floating-input" placeholder=" ">
+                        <label for="inq_motivation" class="floating-label">{{ $settings['inquiry_placeholder_motivation'] ?? 'What led you to explore this type of relationship?' }}</label>
+                    </div>
 
                     <div class="inquiry-footer-row">
                         <div class="lock-notice">

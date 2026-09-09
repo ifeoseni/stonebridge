@@ -34,6 +34,7 @@ class StonebridgeSeeder extends Seeder
             ['key' => 'brand_name', 'value' => 'STONEBRIDGE ADVISORY', 'group' => 'header', 'label' => 'Brand Name', 'type' => 'text', 'order' => 1],
             ['key' => 'header_cta_text', 'value' => 'PRIVATE INQUIRY', 'group' => 'header', 'label' => 'Header CTA Button Label', 'type' => 'text', 'order' => 2],
             ['key' => 'header_cta_link', 'value' => '#private-inquiry', 'group' => 'header', 'label' => 'Header CTA Button Link', 'type' => 'text', 'order' => 3],
+            ['key' => 'default_theme', 'value' => 'dark', 'group' => 'header', 'label' => 'Default Site Theme', 'type' => 'text', 'order' => 4],
 
             // Hero Section
             ['key' => 'hero_title', 'value' => "STONEBRIDGE\nADVISORY", 'group' => 'hero', 'label' => 'Hero Main Title', 'type' => 'textarea', 'order' => 10],
@@ -42,7 +43,8 @@ class StonebridgeSeeder extends Seeder
             ['key' => 'hero_badge', 'value' => 'BY REFERRAL AND LIMITED INVITATION.', 'group' => 'hero', 'label' => 'Hero Invitation Notice', 'type' => 'text', 'order' => 13],
             ['key' => 'hero_cta_text', 'value' => 'PRIVATE INQUIRY', 'group' => 'hero', 'label' => 'Hero CTA Button Label', 'type' => 'text', 'order' => 14],
             ['key' => 'hero_cta_link', 'value' => '#private-inquiry', 'group' => 'hero', 'label' => 'Hero CTA Button Link', 'type' => 'text', 'order' => 15],
-            ['key' => 'hero_image', 'value' => '/images/hero-bridge.jpg', 'group' => 'hero', 'label' => 'Hero Background Image', 'type' => 'image', 'order' => 16],
+            ['key' => 'hero_image', 'value' => '/images/hero-bridge-dark.jpg', 'group' => 'hero', 'label' => 'Hero Background Image (Dark Theme)', 'type' => 'image', 'order' => 16],
+            ['key' => 'hero_image_light', 'value' => '/images/hero-bridge-light.jpg', 'group' => 'hero', 'label' => 'Hero Background Image (Light Theme)', 'type' => 'image', 'order' => 17],
 
             // The Stonebridge Approach
             ['key' => 'approach_tag', 'value' => 'THE STONEBRIDGE APPROACH', 'group' => 'approach', 'label' => 'Section Category Tag', 'type' => 'text', 'order' => 20],

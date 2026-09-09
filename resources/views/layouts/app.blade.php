@@ -12,11 +12,19 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,500&family=Plus+Jakarta+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 
+    <!-- Immediate Theme Initialization Script (prevents flash) -->
+    <script>
+        (function() {
+            const savedTheme = localStorage.getItem('stonebridge_theme') || '{{ $settings["default_theme"] ?? "dark" }}';
+            document.documentElement.setAttribute('data-theme', savedTheme);
+        })();
+    </script>
+
     <style>
         :root {
-            --bg-dark: #0a0c0e;
-            --bg-dark-section: #0c0e10;
-            --bg-approach: #0d0f11;
+            --bg-dark: #090c0f;
+            --bg-dark-section: #0c0f13;
+            --bg-approach: #0d1014;
             --bg-cream: #f4ede4;
             --bg-cream-card: #f4ede4;
             
@@ -24,19 +32,84 @@
             --gold-btn: #bfa176;
             --gold-btn-hover: #cfb388;
             --gold-text: #bfa176;
-            --gold-subtle: rgba(191, 161, 118, 0.2);
+            --gold-subtle: rgba(191, 161, 118, 0.15);
 
             --text-white: #f5f3ef;
-            --text-light-muted: #a1a6ab;
+            --text-light-muted: #a0a6ac;
             --text-dark: #231f1a;
             --text-dark-muted: #575148;
             --text-cream-italic: #9c8360;
 
             --border-dark: rgba(255, 255, 255, 0.08);
-            --border-input: rgba(255, 255, 255, 0.14);
+            --border-input: rgba(255, 255, 255, 0.18);
+            --border-subtle: rgba(255, 255, 255, 0.06);
+
+            --input-bg: #0f1317;
+            --input-bg-focus: #14191f;
+            --input-text: #f5f3ef;
+            --input-placeholder: #8b9299;
+            --input-label: #a0a7af;
+
+            --header-logo-color: #ece8df;
+            --modal-card-bg: #111417;
+
+            --section-py: 100px;
+            --section-px: 64px;
 
             --font-serif: 'Cormorant Garamond', Georgia, "Times New Roman", serif;
             --font-sans: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+        }
+
+        @media (max-width: 1100px) {
+            :root {
+                --section-py: 90px;
+                --section-px: 36px;
+            }
+        }
+        @media (max-width: 900px) {
+            :root {
+                --section-py: 80px;
+                --section-px: 32px;
+            }
+        }
+        @media (max-width: 600px) {
+            :root {
+                --section-py: 72px;
+                --section-px: 22px;
+            }
+        }
+
+        [data-theme="light"] {
+            --bg-dark: #fbf8f3;
+            --bg-dark-section: #f4eee5;
+            --bg-approach: #f5efe6;
+            --bg-cream: #ede4d6;
+            --bg-cream-card: #ffffff;
+            
+            --gold-accent: #9b794b;
+            --gold-btn: #9b794b;
+            --gold-btn-hover: #86663c;
+            --gold-text: #9b794b;
+            --gold-subtle: rgba(155, 121, 75, 0.12);
+
+            --text-white: #1a1714;
+            --text-light-muted: #675f56;
+            --text-dark: #1a1714;
+            --text-dark-muted: #5c554b;
+            --text-cream-italic: #84673f;
+
+            --border-dark: rgba(30, 24, 18, 0.1);
+            --border-input: rgba(30, 24, 18, 0.22);
+            --border-subtle: rgba(30, 24, 18, 0.08);
+
+            --input-bg: #ffffff;
+            --input-bg-focus: #fcfbfa;
+            --input-text: #1d1916;
+            --input-placeholder: #7c7469;
+            --input-label: #5a5247;
+
+            --header-logo-color: #1a1613;
+            --modal-card-bg: #ffffff;
         }
 
         * {
@@ -53,6 +126,7 @@
             line-height: 1.6;
             -webkit-font-smoothing: antialiased;
             overflow-x: hidden;
+            transition: background-color 0.3s ease, color 0.3s ease;
         }
 
         /* Typography */
@@ -75,13 +149,14 @@
             font-family: var(--font-serif);
             font-size: 16px;
             letter-spacing: 0.25em;
-            color: #ece8df;
+            color: var(--header-logo-color);
             text-decoration: none;
             text-transform: uppercase;
             font-weight: 500;
             display: flex;
             flex-direction: column;
             line-height: 1.25;
+            transition: color 0.3s ease;
         }
         .header-logo span {
             font-size: 14px;
@@ -90,7 +165,7 @@
         .header-right {
             display: flex;
             align-items: center;
-            gap: 28px;
+            gap: 20px;
         }
         .header-btn {
             display: inline-block;
@@ -109,7 +184,34 @@
         .header-btn:hover {
             border-color: #dfc8a5 !important;
             color: #dfc8a5 !important;
-            background: rgba(191, 161, 118, 0.1) !important;
+            background: var(--gold-subtle) !important;
+        }
+
+        /* Theme Toggle Button */
+        .theme-toggle-btn {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border-dark);
+            color: var(--text-light-muted);
+            font-family: var(--font-sans);
+            font-size: 10px;
+            letter-spacing: 0.18em;
+            text-transform: uppercase;
+            font-weight: 500;
+            padding: 8px 14px;
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            cursor: pointer;
+            border-radius: 2px;
+            transition: all 0.25s ease;
+        }
+        [data-theme="light"] .theme-toggle-btn {
+            background: rgba(0, 0, 0, 0.04);
+        }
+        .theme-toggle-btn:hover {
+            color: var(--gold-accent);
+            border-color: var(--gold-accent);
+            background: var(--gold-subtle);
         }
 
         /* Sub-page Modal Drawer */
@@ -270,6 +372,25 @@
         </a>
 
         <div class="header-right">
+            <!-- Theme Mode Switcher -->
+            <button type="button" class="theme-toggle-btn" onclick="toggleTheme()" aria-label="Toggle Dark/Light Mode" id="themeToggleBtn">
+                <svg class="theme-icon-moon" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                </svg>
+                <svg class="theme-icon-sun" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:none;">
+                    <circle cx="12" cy="12" r="5"></circle>
+                    <line x1="12" y1="1" x2="12" y2="3"></line>
+                    <line x1="12" y1="21" x2="12" y2="23"></line>
+                    <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                    <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                    <line x1="1" y1="12" x2="3" y2="12"></line>
+                    <line x1="21" y1="12" x2="23" y2="12"></line>
+                    <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                    <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                </svg>
+                <span class="theme-toggle-label" id="themeToggleText">LIGHT</span>
+            </button>
+
             @if(isset($subPages) && count($subPages) > 0)
                 <div class="header-docs-dropdown">
                     <button type="button" class="header-docs-btn" onclick="toggleDocsMenu(event)">
@@ -304,17 +425,46 @@
             <div style="font-size:11px; letter-spacing:0.25em; text-transform:uppercase; color:var(--gold-accent); font-weight:600; margin-bottom:12px;">
                 {{ $settings['modal_eyebrow'] ?? 'CONFIDENTIAL CHARTER' }}
             </div>
-            <h2 class="serif" id="modalTitle" style="font-size:36px; font-weight:400; color:#f5f3ef; margin-bottom:8px; line-height:1.2;"></h2>
-            <p id="modalSubtitle" style="color:var(--gold-text); font-size:15px; margin-bottom:24px; font-style:italic; border-bottom:1px solid rgba(255,255,255,0.1); padding-bottom:16px;"></p>
-            <div id="modalContent" style="color:#c5c8cc; font-size:15px; line-height:1.85;"></div>
-            <div style="margin-top:36px; padding-top:20px; border-top:1px solid rgba(255,255,255,0.08); display:flex; justify-content:space-between; align-items:center;">
-                <span style="font-size:11px; letter-spacing:0.2em; text-transform:uppercase; color:#686d73;">{{ $settings['brand_name'] ?? 'STONEBRIDGE ADVISORY' }}</span>
+            <h2 class="serif" id="modalTitle" style="font-size:36px; font-weight:400; color:var(--text-white); margin-bottom:8px; line-height:1.2;"></h2>
+            <p id="modalSubtitle" style="color:var(--gold-text); font-size:15px; margin-bottom:24px; font-style:italic; border-bottom:1px solid var(--border-dark); padding-bottom:16px;"></p>
+            <div id="modalContent" style="font-size:15px; line-height:1.85;"></div>
+            <div style="margin-top:36px; padding-top:20px; border-top:1px solid var(--border-dark); display:flex; justify-content:space-between; align-items:center;">
+                <span style="font-size:11px; letter-spacing:0.2em; text-transform:uppercase; color:var(--text-light-muted);">{{ $settings['brand_name'] ?? 'STONEBRIDGE ADVISORY' }}</span>
                 <button onclick="closeModal()" class="header-btn">{{ $settings['modal_close_label'] ?? 'Close Document' }}</button>
             </div>
         </div>
     </div>
 
     <script>
+        function toggleTheme() {
+            const currentTheme = document.documentElement.getAttribute('data-theme') || 'dark';
+            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            document.documentElement.setAttribute('data-theme', newTheme);
+            localStorage.setItem('stonebridge_theme', newTheme);
+            updateThemeUI(newTheme);
+            window.dispatchEvent(new CustomEvent('themeChanged', { detail: { theme: newTheme } }));
+        }
+
+        function updateThemeUI(theme) {
+            const moon = document.querySelector('.theme-icon-moon');
+            const sun = document.querySelector('.theme-icon-sun');
+            const label = document.getElementById('themeToggleText');
+            if (theme === 'light') {
+                if (moon) moon.style.display = 'none';
+                if (sun) sun.style.display = 'block';
+                if (label) label.innerText = 'DARK';
+            } else {
+                if (moon) moon.style.display = 'block';
+                if (sun) sun.style.display = 'none';
+                if (label) label.innerText = 'LIGHT';
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const theme = document.documentElement.getAttribute('data-theme') || 'dark';
+            updateThemeUI(theme);
+        });
+
         function openSubPage(slug) {
             fetch(`/api/page/${slug}`)
                 .then(res => res.json())

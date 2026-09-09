@@ -19,14 +19,15 @@
     }
     .page-hero {
         padding: 160px 0 80px;
-        background: #0d0f12;
-        border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+        background: var(--bg-dark-section);
+        border-bottom: 1px solid var(--border-subtle);
+        transition: background-color 0.3s ease;
     }
     .page-hero-title {
         font-family: var(--font-serif);
         font-size: 52px;
         font-weight: 300;
-        color: #f7f4ed;
+        color: var(--text-white);
         margin-bottom: 16px;
         line-height: 1.15;
     }
@@ -38,18 +39,19 @@
     }
     .page-body-section {
         padding: 80px 0 120px;
-        background: #0a0c0e;
+        background: var(--bg-dark);
+        transition: background-color 0.3s ease;
     }
     .page-content-wrapper {
         max-width: 780px;
         margin: 0 auto;
         font-size: 16px;
         line-height: 1.9;
-        color: #ccd0d5;
+        color: var(--text-light-muted);
     }
     .page-content-wrapper h2, .page-content-wrapper h3 {
         font-family: var(--font-serif);
-        color: #f6f3eb;
+        color: var(--text-white);
         font-weight: 400;
         margin-top: 48px;
         margin-bottom: 20px;
@@ -79,7 +81,7 @@
         font-size: 13px;
     }
     .page-content-wrapper strong {
-        color: #f5f3ef;
+        color: var(--text-white);
         font-weight: 600;
     }
     .page-back-nav {
@@ -95,7 +97,7 @@
         transition: color 0.2s;
     }
     .page-back-nav:hover {
-        color: #fff;
+        color: var(--gold-btn-hover);
     }
     .btn-gold {
         display: inline-block;
@@ -109,6 +111,7 @@
         padding: 13px 26px;
         text-decoration: none;
         border: none;
+        border-radius: 2px;
         cursor: pointer;
         transition: all 0.25s ease;
     }
@@ -128,12 +131,13 @@
         padding: 12px 24px;
         text-decoration: none;
         border: 1px solid var(--gold-accent);
+        border-radius: 2px;
         cursor: pointer;
         transition: all 0.25s ease;
     }
     .btn-outline-gold:hover {
-        background: rgba(191, 161, 118, 0.1);
-        color: #f7f4ed;
+        background: var(--gold-subtle);
+        color: var(--gold-accent);
     }
 </style>
 @endsection
@@ -166,7 +170,7 @@
     </section>
 
     <!-- Simple footer -->
-    <footer style="background:#060708; padding:32px 0; border-top:1px solid rgba(255,255,255,0.06); text-align:center; font-size:12px; color:#6a7178;">
+    <footer style="background:var(--bg-dark-section); padding:36px 0; border-top:1px solid var(--border-subtle); text-align:center; font-size:12px; color:var(--text-light-muted); transition:background-color 0.3s ease;">
         <div class="container">
             {{ $settings['brand_name'] ?? 'STONEBRIDGE ADVISORY' }} &mdash; {{ $settings['footer_tagline'] ?? 'Confidential. Personalized. Enduring.' }}
         </div>
