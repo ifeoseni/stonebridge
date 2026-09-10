@@ -209,6 +209,14 @@
             font-size: 14px;
             letter-spacing: 0.3em;
         }
+        [data-theme="light"] .header-logo {
+            text-shadow:
+                -1px -1px 0 #fff,
+                1px -1px 0 #fff,
+                -1px 1px 0 #fff,
+                1px 1px 0 #fff,
+                0 0 2px rgba(255, 255, 255, 0.9);
+        }
         .header-right {
             display: flex;
             align-items: center;
@@ -232,6 +240,15 @@
             border-color: #dfc8a5 !important;
             color: #dfc8a5 !important;
             background: var(--gold-subtle) !important;
+        }
+        [data-theme="light"] .header-btn {
+            color: #1a1613 !important;
+            border-color: #1a1613 !important;
+        }
+        [data-theme="light"] .header-btn:hover {
+            color: #ffffff !important;
+            border-color: #1a1613 !important;
+            background: #1a1613 !important;
         }
 
         /* Theme Toggle Button */
@@ -257,6 +274,8 @@
         }
         [data-theme="light"] .theme-toggle-btn {
             background: rgba(0, 0, 0, 0.04);
+            color: #1a1613;
+            border-color: rgba(26, 22, 19, 0.25);
         }
         .theme-toggle-btn:hover {
             color: var(--gold-accent);
@@ -366,6 +385,15 @@
             align-items: center;
             gap: 6px;
             transition: color 0.2s;
+        }
+        [data-theme="light"] .header-docs-btn {
+            color: #1a1613;
+            text-shadow:
+                -1px -1px 0 #fff,
+                1px -1px 0 #fff,
+                -1px 1px 0 #fff,
+                1px 1px 0 #fff,
+                0 0 2px rgba(255, 255, 255, 0.9);
         }
         .header-docs-btn:hover {
             color: var(--gold-accent);

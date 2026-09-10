@@ -82,9 +82,9 @@
     .hero-vignette-light {
         background: radial-gradient(
             ellipse at 50% 28%,
-            rgba(235, 242, 248, 0.3) 0%,
-            rgba(251, 248, 243, 0.68) 55%,
-            rgba(251, 248, 243, 0.96) 100%
+            rgba(251, 248, 243, 0.02) 0%,
+            rgba(251, 248, 243, 0.08) 55%,
+            rgba(251, 248, 243, 0.22) 100%
         );
         opacity: 0;
     }
@@ -126,8 +126,13 @@
         text-shadow: 0 4px 28px rgba(0, 0, 0, 0.75);
     }
     [data-theme="light"] .hero-title {
-        color: #211c17;
-        text-shadow: 0 2px 24px rgba(255, 255, 255, 0.85);
+        color: #14110d;
+        text-shadow:
+            -1px -1px 0 #fff,
+            1px -1px 0 #fff,
+            -1px 1px 0 #fff,
+            1px 1px 0 #fff,
+            0 0 2px rgba(255, 255, 255, 0.9);
     }
     .btn-hero-inquiry {
         display: inline-block;
@@ -573,6 +578,15 @@
         display: flex;
         flex-direction: column;
         gap: 16px;
+    }
+    /* Honeypot: kept in the layout and focusable-by-script so automated fillers still find it, but positioned off-screen for real visitors */
+    .hp-field {
+        position: absolute;
+        left: -9999px;
+        top: -9999px;
+        width: 1px;
+        height: 1px;
+        overflow: hidden;
     }
     .inquiry-row-3 {
         display: grid;
@@ -1051,6 +1065,14 @@
                 <form id="inquiryForm" class="inquiry-form-wrapper" method="POST" action="{{ route('inquiry.store') }}">
                     @csrf
 
+                    {{-- Honeypot: invisible to real visitors, irresistible to bots. Left blank by humans, filled by scripts.
+                         Name/label deliberately avoid "website", "company", "url" etc. so browser autofill won't touch it. --}}
+                    <div class="hp-field" aria-hidden="true">
+                        <label for="inq_hp_note">Leave this field blank</label>
+                        <input type="text" name="hp_note" id="inq_hp_note" tabindex="-1" autocomplete="off">
+                    </div>
+                    <input type="hidden" name="form_rendered_at" value="{{ now()->timestamp }}">
+
                     <div class="inquiry-row-3">
                         <div class="form-floating-group">
                             <input type="text" name="full_name" id="inq_full_name" class="floating-input" placeholder=" " required>
@@ -1137,8 +1159,8 @@
                     'Accept': 'application/json'
                 }
             })
-            .then(res => res.json())
-            .then(data => {
+            .then(res => res.json().then(data => ({ status: res.status, data })))
+            .then(({ status, data }) => {
                 btn.innerText = originalLabel;
                 btn.disabled = false;
                 if (data.success) {
@@ -1147,6 +1169,9 @@
                     form.reset();
                 } else if (data.errors) {
                     alertBox.innerText = Object.values(data.errors).flat().join(' ');
+                    alertBox.style.display = 'block';
+                } else if (status === 429) {
+                    alertBox.innerText = data.message || 'Too many attempts. Please wait a moment and try again.';
                     alertBox.style.display = 'block';
                 } else {
                     alertBox.innerText = inquiryText.validationError;

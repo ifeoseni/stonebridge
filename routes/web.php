@@ -14,7 +14,7 @@ use Illuminate\Support\Facades\Route;
 Route::get('/', [HomeController::class, 'index'])->name('home');
 Route::get('/page/{slug}', [HomeController::class, 'page'])->name('page.show');
 Route::get('/api/page/{slug}', [HomeController::class, 'pageJson'])->name('page.json');
-Route::post('/inquiry', [InquiryController::class, 'store'])->name('inquiry.store');
+Route::post('/inquiry', [InquiryController::class, 'store'])->middleware('throttle:3,1')->name('inquiry.store');
 
 // Admin Authentication Routes
 Route::get('/admin/login', [AuthController::class, 'showLogin'])->name('admin.login');
