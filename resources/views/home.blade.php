@@ -9,7 +9,7 @@
         --hero-bg-image: url('{{ $settings["hero_image"] ?? "/images/hero-bridge-dark.jpg" }}');
     }
     [data-theme="light"] {
-        --hero-bg-image: url('{{ $settings["hero_image_light"] ?? "/images/hero-bridge-light.jpg" }}');
+        --hero-bg-image: url('{{ $settings["hero_image_light"] ?? "/images/light-stone-bridge-image.jpeg" }}');
     }
 
     /* Standardized Section Padding Across All Blocks */
@@ -51,7 +51,7 @@
         z-index: 0;
     }
     .hero-bg-light {
-        background-image: url('{{ $settings["hero_image_light"] ?? "/images/hero-bridge-light.jpg" }}');
+        background-image: url('{{ $settings["hero_image_light"] ?? "/images/light-stone-bridge-image.jpeg" }}');
         opacity: 0;
         z-index: 0;
     }
@@ -1145,6 +1145,9 @@
                     alertBox.innerText = data.message;
                     alertBox.style.display = 'block';
                     form.reset();
+                } else if (data.errors) {
+                    alertBox.innerText = Object.values(data.errors).flat().join(' ');
+                    alertBox.style.display = 'block';
                 } else {
                     alertBox.innerText = inquiryText.validationError;
                     alertBox.style.display = 'block';

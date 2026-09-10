@@ -19,7 +19,7 @@ class InquiryController extends Controller
             'full_name' => 'required|string|max:255',
             'email' => 'required|email|max:255',
             'phone' => 'nullable|string|max:50',
-            'circumstances' => 'required|string|min:10',
+            'circumstances' => 'required|string',
             'motivation' => 'nullable|string',
         ]);
 
