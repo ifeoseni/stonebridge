@@ -127,12 +127,12 @@
     }
     [data-theme="light"] .hero-title {
         color: #14110d;
-        text-shadow:
-            -1px -1px 0 #fff,
-            1px -1px 0 #fff,
-            -1px 1px 0 #fff,
-            1px 1px 0 #fff,
-            0 0 2px rgba(255, 255, 255, 0.9);
+        text-shadow: 0 1px 6px rgba(255, 255, 255, 0.55);
+    }
+    @media (max-width: 768px) {
+        [data-theme="light"] .hero-title {
+            text-shadow: none;
+        }
     }
     .btn-hero-inquiry {
         display: inline-block;
