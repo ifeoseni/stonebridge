@@ -22,11 +22,11 @@
        ========================================================================== */
     .hero-wrap {
         position: relative;
-        min-height: 100vh;
+        min-height: 78vh;
         display: flex;
         align-items: center;
         justify-content: center;
-        padding: 160px var(--section-px) var(--section-py) var(--section-px);
+        padding: 120px var(--section-px) var(--section-py) var(--section-px);
         overflow: hidden;
         width: 100%;
         max-width: 100%;
@@ -433,6 +433,8 @@
         min-height: 480px;
     }
     .retainer-photo-side img {
+        position: absolute;
+        inset: 0;
         width: 100%;
         height: 100%;
         object-fit: cover;
@@ -444,7 +446,7 @@
        ========================================================================== */
     .founder-wrap {
         display: grid;
-        grid-template-columns: 44% 56%;
+        grid-template-columns: 38% 62%;
         background-color: var(--bg-cream);
         border-bottom: 1px solid var(--border-subtle);
         transition: background-color 0.3s ease;
@@ -452,12 +454,16 @@
     .founder-photo-half {
         position: relative;
         background-color: #000;
+        aspect-ratio: 446 / 659;
         min-height: 480px;
     }
     .founder-photo-half img {
+        position: absolute;
+        inset: 0;
         width: 100%;
         height: 100%;
         object-fit: cover;
+        object-position: center 12%;
         display: block;
         filter: grayscale(100%);
     }

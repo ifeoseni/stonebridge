@@ -726,38 +726,6 @@
                             </td>
                         </tr>
                         <tr>
-                            <th><label for="header_cta_text">Top Right CTA Button Label</label></th>
-                            <td>
-                                <input type="text" name="header_cta_text" id="header_cta_text" class="regular-text" value="{{ \App\Models\SiteSetting::get('header_cta_text') }}">
-                            </td>
-                        </tr>
-                        <tr>
-                            <th><label for="header_cta_link">Top Right CTA Button Link</label></th>
-                            <td>
-                                <input type="text" name="header_cta_link" id="header_cta_link" class="regular-text" value="{{ \App\Models\SiteSetting::get('header_cta_link') }}">
-                                <p class="description">Defaults to <code>#private-inquiry</code> for smooth scroll to inquiry form.</p>
-                            </td>
-                        </tr>
-                        <tr>
-                            <th><label for="header_docs_label">Documents Menu Label</label></th>
-                            <td>
-                                <input type="text" name="header_docs_label" id="header_docs_label" class="regular-text" value="{{ \App\Models\SiteSetting::get('header_docs_label', 'DOCUMENTS') }}">
-                                <p class="description">Label for the discreet header dropdown that lists confidential sub-pages.</p>
-                            </td>
-                        </tr>
-                        <tr>
-                            <th><label for="modal_eyebrow">Document Modal Eyebrow Text</label></th>
-                            <td>
-                                <input type="text" name="modal_eyebrow" id="modal_eyebrow" class="regular-text" value="{{ \App\Models\SiteSetting::get('modal_eyebrow', 'CONFIDENTIAL CHARTER') }}">
-                            </td>
-                        </tr>
-                        <tr>
-                            <th><label for="modal_close_label">Document Modal Close Button Label</label></th>
-                            <td>
-                                <input type="text" name="modal_close_label" id="modal_close_label" class="regular-text" value="{{ \App\Models\SiteSetting::get('modal_close_label', 'Close Document') }}">
-                            </td>
-                        </tr>
-                        <tr>
                             <th><label for="footer_brand">Footer Brand Name</label></th>
                             <td>
                                 <input type="text" name="footer_brand" id="footer_brand" class="regular-text" value="{{ \App\Models\SiteSetting::get('footer_brand', 'STONEBRIDGE ADVISORY') }}">
