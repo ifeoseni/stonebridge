@@ -12,38 +12,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,500&family=Plus+Jakarta+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 
-    <meta name="theme-color" id="metaThemeColor" content="#090c0f">
-
-    <!-- Immediate Theme Initialization Script (prevents flash & synchronizes with device theme) -->
-    <script>
-        (function() {
-            const hasMedia = window.matchMedia;
-            const devicePrefersDark = hasMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
-            const currentDeviceTheme = devicePrefersDark ? 'dark' : 'light';
-            const lastDeviceTheme = localStorage.getItem('stonebridge_last_device_theme');
-            let savedTheme = localStorage.getItem('stonebridge_theme');
-
-            // If the user changed their device/phone OS theme setting, automatically sync to match the device
-            if (lastDeviceTheme && lastDeviceTheme !== currentDeviceTheme) {
-                savedTheme = currentDeviceTheme;
-                localStorage.setItem('stonebridge_theme', currentDeviceTheme);
-            } else if (!savedTheme) {
-                if (hasMedia && window.matchMedia('(prefers-color-scheme: light)').matches) {
-                    savedTheme = 'light';
-                } else if (hasMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
-                    savedTheme = 'dark';
-                } else {
-                    savedTheme = '{{ $settings["default_theme"] ?? "dark" }}';
-                }
-            }
-            localStorage.setItem('stonebridge_last_device_theme', currentDeviceTheme);
-            document.documentElement.setAttribute('data-theme', savedTheme);
-            const metaTheme = document.getElementById('metaThemeColor');
-            if (metaTheme) {
-                metaTheme.setAttribute('content', savedTheme === 'light' ? '#fbf8f3' : '#090c0f');
-            }
-        })();
-    </script>
+    <meta name="theme-color" content="#090c0f">
 
     <style>
         :root {
@@ -104,39 +73,6 @@
             }
         }
 
-        [data-theme="light"] {
-            --bg-dark: #fbf8f3;
-            --bg-dark-section: #f4eee5;
-            --bg-approach: #f5efe6;
-            --bg-cream: #ede4d6;
-            --bg-cream-card: #ffffff;
-            
-            --gold-accent: #9b794b;
-            --gold-btn: #9b794b;
-            --gold-btn-hover: #86663c;
-            --gold-text: #9b794b;
-            --gold-subtle: rgba(155, 121, 75, 0.12);
-
-            --text-white: #1a1714;
-            --text-light-muted: #675f56;
-            --text-dark: #1a1714;
-            --text-dark-muted: #5c554b;
-            --text-cream-italic: #84673f;
-
-            --border-dark: rgba(30, 24, 18, 0.1);
-            --border-input: rgba(30, 24, 18, 0.22);
-            --border-subtle: rgba(30, 24, 18, 0.08);
-
-            --input-bg: #ffffff;
-            --input-bg-focus: #fcfbfa;
-            --input-text: #1d1916;
-            --input-placeholder: #7c7469;
-            --input-label: #5a5247;
-
-            --header-logo-color: #1a1613;
-            --modal-card-bg: #ffffff;
-        }
-
         * {
             margin: 0;
             padding: 0;
@@ -154,24 +90,6 @@
             width: 100%;
             max-width: 100%;
             position: relative;
-        }
-
-        /* Seamless Theme Color Flow Transitions */
-        html, body,
-        .site-header,
-        .header-logo,
-        .header-btn,
-        .theme-toggle-btn,
-        .modal-card,
-        .modal-overlay,
-        .modal-close,
-        .header-docs-btn,
-        .header-docs-menu,
-        .header-docs-menu a {
-            transition: background-color 0.4s cubic-bezier(0.4, 0, 0.2, 1),
-                        color 0.4s cubic-bezier(0.4, 0, 0.2, 1),
-                        border-color 0.4s cubic-bezier(0.4, 0, 0.2, 1),
-                        box-shadow 0.4s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
         /* Typography */
@@ -209,14 +127,6 @@
             font-size: 14px;
             letter-spacing: 0.3em;
         }
-        [data-theme="light"] .header-logo {
-            text-shadow: 0 1px 6px rgba(255, 255, 255, 0.55);
-        }
-        @media (max-width: 768px) {
-            [data-theme="light"] .header-logo {
-                text-shadow: none;
-            }
-        }
         .header-right {
             display: flex;
             align-items: center;
@@ -240,47 +150,6 @@
             border-color: #dfc8a5 !important;
             color: #dfc8a5 !important;
             background: var(--gold-subtle) !important;
-        }
-        [data-theme="light"] .header-btn {
-            color: #1a1613 !important;
-            border-color: #1a1613 !important;
-        }
-        [data-theme="light"] .header-btn:hover {
-            color: #ffffff !important;
-            border-color: #1a1613 !important;
-            background: #1a1613 !important;
-        }
-
-        /* Theme Toggle Button */
-        .theme-toggle-btn {
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid var(--border-dark);
-            color: var(--text-light-muted);
-            font-family: var(--font-sans);
-            font-size: 10px;
-            letter-spacing: 0.18em;
-            text-transform: uppercase;
-            font-weight: 500;
-            padding: 8px 14px;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            gap: 7px;
-            cursor: pointer;
-            border-radius: 2px;
-            transition: all 0.25s ease;
-            flex-shrink: 0;
-            box-sizing: border-box;
-        }
-        [data-theme="light"] .theme-toggle-btn {
-            background: rgba(0, 0, 0, 0.04);
-            color: #1a1613;
-            border-color: rgba(26, 22, 19, 0.25);
-        }
-        .theme-toggle-btn:hover {
-            color: var(--gold-accent);
-            border-color: var(--gold-accent);
-            background: var(--gold-subtle);
         }
 
         /* Sub-page Modal Drawer */
@@ -386,15 +255,6 @@
             gap: 6px;
             transition: color 0.2s;
         }
-        [data-theme="light"] .header-docs-btn {
-            color: #1a1613;
-            text-shadow: 0 1px 6px rgba(255, 255, 255, 0.55);
-        }
-        @media (max-width: 768px) {
-            [data-theme="light"] .header-docs-btn {
-                text-shadow: none;
-            }
-        }
         .header-docs-btn:hover {
             color: var(--gold-accent);
         }
@@ -455,18 +315,6 @@
                 gap: 8px;
                 flex-shrink: 0;
             }
-            .theme-toggle-btn {
-                padding: 0 !important;
-                width: 34px !important;
-                height: 34px !important;
-                min-width: 34px !important;
-                justify-content: center !important;
-                border-radius: 3px;
-                flex-shrink: 0;
-            }
-            .theme-toggle-btn .theme-toggle-label {
-                display: none !important; /* Hide 'LIGHT'/'DARK' text on all mobile/tablet screens so button is a compact square icon, completely eliminating horizontal overflow */
-            }
             .header-btn {
                 padding: 8px 14px;
                 font-size: 9.5px;
@@ -492,11 +340,6 @@
             }
             .header-right {
                 gap: 6px;
-            }
-            .theme-toggle-btn {
-                width: 32px !important;
-                height: 32px !important;
-                min-width: 32px !important;
             }
             .header-btn {
                 padding: 7px 11px;
@@ -532,25 +375,6 @@
         </a>
 
         <div class="header-right">
-            <!-- Theme Mode Switcher -->
-            <button type="button" class="theme-toggle-btn" onclick="toggleTheme()" aria-label="Toggle Dark/Light Mode" id="themeToggleBtn">
-                <svg class="theme-icon-moon" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
-                </svg>
-                <svg class="theme-icon-sun" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:none;">
-                    <circle cx="12" cy="12" r="5"></circle>
-                    <line x1="12" y1="1" x2="12" y2="3"></line>
-                    <line x1="12" y1="21" x2="12" y2="23"></line>
-                    <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
-                    <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
-                    <line x1="1" y1="12" x2="3" y2="12"></line>
-                    <line x1="21" y1="12" x2="23" y2="12"></line>
-                    <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
-                    <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
-                </svg>
-                <span class="theme-toggle-label" id="themeToggleText">LIGHT</span>
-            </button>
-
             @if(isset($subPages) && count($subPages) > 0)
                 <div class="header-docs-dropdown">
                     <button type="button" class="header-docs-btn" onclick="toggleDocsMenu(event)">
@@ -596,68 +420,6 @@
     </div>
 
     <script>
-        function updateMetaThemeColor(theme) {
-            const metaTheme = document.getElementById('metaThemeColor') || document.querySelector('meta[name="theme-color"]');
-            if (metaTheme) {
-                metaTheme.setAttribute('content', theme === 'light' ? '#fbf8f3' : '#090c0f');
-            }
-        }
-
-        function applyTheme(newTheme, isManual = true) {
-            document.documentElement.setAttribute('data-theme', newTheme);
-            localStorage.setItem('stonebridge_theme', newTheme);
-            updateThemeUI(newTheme);
-            updateMetaThemeColor(newTheme);
-            window.dispatchEvent(new CustomEvent('themeChanged', { detail: { theme: newTheme, isManual: isManual } }));
-        }
-
-        function toggleTheme() {
-            const currentTheme = document.documentElement.getAttribute('data-theme') || 'dark';
-            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
-            applyTheme(newTheme, true);
-        }
-
-        function updateThemeUI(theme) {
-            const moon = document.querySelector('.theme-icon-moon');
-            const sun = document.querySelector('.theme-icon-sun');
-            const label = document.getElementById('themeToggleText');
-            const btn = document.getElementById('themeToggleBtn');
-            if (theme === 'light') {
-                if (moon) moon.style.display = 'none';
-                if (sun) sun.style.display = 'block';
-                if (label) label.innerText = 'DARK';
-                if (btn) btn.setAttribute('title', 'Switch to Dark Theme');
-            } else {
-                if (moon) moon.style.display = 'block';
-                if (sun) sun.style.display = 'none';
-                if (label) label.innerText = 'LIGHT';
-                if (btn) btn.setAttribute('title', 'Switch to Light Theme');
-            }
-        }
-
-        // Active Device OS Theme Synchronization
-        // When the user changes their mobile phone / device theme in phone settings,
-        // the website immediately flows into that theme in real-time!
-        if (window.matchMedia) {
-            const darkMediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
-            const handleDeviceThemeChange = function(e) {
-                const newDeviceTheme = e.matches ? 'dark' : 'light';
-                localStorage.setItem('stonebridge_last_device_theme', newDeviceTheme);
-                applyTheme(newDeviceTheme, false);
-            };
-            if (darkMediaQuery.addEventListener) {
-                darkMediaQuery.addEventListener('change', handleDeviceThemeChange);
-            } else if (darkMediaQuery.addListener) {
-                darkMediaQuery.addListener(handleDeviceThemeChange);
-            }
-        }
-
-        document.addEventListener('DOMContentLoaded', function() {
-            const theme = document.documentElement.getAttribute('data-theme') || 'dark';
-            updateThemeUI(theme);
-            updateMetaThemeColor(theme);
-        });
-
         function openSubPage(slug) {
             fetch(`/api/page/${slug}`)
                 .then(res => res.json())

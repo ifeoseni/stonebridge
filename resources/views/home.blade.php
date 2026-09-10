@@ -8,9 +8,6 @@
     :root {
         --hero-bg-image: url('{{ $settings["hero_image"] ?? "/images/hero-bridge-dark.jpg" }}');
     }
-    [data-theme="light"] {
-        --hero-bg-image: url('{{ $settings["hero_image_light"] ?? "/images/light-stone-bridge-image.jpeg" }}');
-    }
 
     /* Standardized Section Padding Across All Blocks */
     .section-standard-padding {
@@ -35,41 +32,21 @@
         max-width: 100%;
         box-sizing: border-box;
     }
-    .hero-bg-dark,
-    .hero-bg-light {
+    .hero-bg-dark {
         position: absolute;
         inset: 0;
         background-repeat: no-repeat;
         background-position: center center;
         background-size: cover;
         pointer-events: none;
-        transition: opacity 0.5s cubic-bezier(0.4, 0, 0.2, 1);
-    }
-    .hero-bg-dark {
         background-image: url('{{ $settings["hero_image"] ?? "/images/hero-bridge-dark.jpg" }}');
-        opacity: 1;
         z-index: 0;
     }
-    .hero-bg-light {
-        background-image: url('{{ $settings["hero_image_light"] ?? "/images/light-stone-bridge-image.jpeg" }}');
-        opacity: 0;
-        z-index: 0;
-    }
-    [data-theme="light"] .hero-bg-dark {
-        opacity: 0;
-    }
-    [data-theme="light"] .hero-bg-light {
-        opacity: 1;
-    }
-    .hero-vignette-dark,
-    .hero-vignette-light {
+    .hero-vignette-dark {
         position: absolute;
         inset: 0;
         z-index: 1;
         pointer-events: none;
-        transition: opacity 0.5s cubic-bezier(0.4, 0, 0.2, 1);
-    }
-    .hero-vignette-dark {
         /* Atmospheric twilight blue sky & soft charcoal vignette */
         background: radial-gradient(
             ellipse at 50% 28%,
@@ -77,22 +54,6 @@
             rgba(11, 16, 22, 0.76) 55%,
             rgba(8, 11, 15, 0.96) 100%
         );
-        opacity: 1;
-    }
-    .hero-vignette-light {
-        background: radial-gradient(
-            ellipse at 50% 28%,
-            rgba(251, 248, 243, 0.02) 0%,
-            rgba(251, 248, 243, 0.08) 55%,
-            rgba(251, 248, 243, 0.22) 100%
-        );
-        opacity: 0;
-    }
-    [data-theme="light"] .hero-vignette-dark {
-        opacity: 0;
-    }
-    [data-theme="light"] .hero-vignette-light {
-        opacity: 1;
     }
     .hero-bottom-grad {
         position: absolute;
@@ -125,15 +86,6 @@
         margin-bottom: 36px;
         text-shadow: 0 4px 28px rgba(0, 0, 0, 0.75);
     }
-    [data-theme="light"] .hero-title {
-        color: #14110d;
-        text-shadow: 0 1px 6px rgba(255, 255, 255, 0.55);
-    }
-    @media (max-width: 768px) {
-        [data-theme="light"] .hero-title {
-            text-shadow: none;
-        }
-    }
     .btn-hero-inquiry {
         display: inline-block;
         background: rgba(14, 18, 22, 0.45);
@@ -152,10 +104,6 @@
         cursor: pointer;
         transition: all 0.25s ease;
         box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
-    }
-    [data-theme="light"] .btn-hero-inquiry {
-        background: rgba(255, 255, 255, 0.85);
-        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
     }
     .btn-hero-inquiry:hover {
         background: var(--gold-btn) !important;
@@ -881,9 +829,7 @@
          ========================================================================= -->
     <section class="hero-wrap" id="hero">
         <div class="hero-bg-dark"></div>
-        <div class="hero-bg-light"></div>
         <div class="hero-vignette-dark"></div>
-        <div class="hero-vignette-light"></div>
         <div class="hero-bottom-grad"></div>
 
         <div class="hero-inner">

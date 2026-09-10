@@ -214,25 +214,13 @@
                             </td>
                         </tr>
                         <tr>
-                            <th><label>Hero Background (Dark Theme)</label></th>
+                            <th><label>Hero Background Photography</label></th>
                             <td>
                                 <div style="display:flex; gap:20px; align-items:flex-start;">
-                                    <img src="{{ \App\Models\SiteSetting::get('hero_image', '/images/hero-bridge-dark.jpg') }}" style="width:240px; height:135px; object-fit:cover; border:1px solid #c3c4c7; box-shadow:0 1px 3px rgba(0,0,0,0.1);" alt="Current Dark Hero Bridge">
+                                    <img src="{{ \App\Models\SiteSetting::get('hero_image', '/images/hero-bridge-dark.jpg') }}" style="width:240px; height:135px; object-fit:cover; border:1px solid #c3c4c7; box-shadow:0 1px 3px rgba(0,0,0,0.1);" alt="Current Hero Bridge">
                                     <div>
                                         <input type="file" name="hero_image_file" accept="image/*">
-                                        <p class="description">Moody stone bridge with twilight sky & mist for Dark Theme. Recommended 1920x1080.</p>
-                                    </div>
-                                </div>
-                            </td>
-                        </tr>
-                        <tr>
-                            <th><label>Hero Background (Light Theme)</label></th>
-                            <td>
-                                <div style="display:flex; gap:20px; align-items:flex-start;">
-                                    <img src="{{ \App\Models\SiteSetting::get('hero_image_light', '/images/light-stone-bridge-image.jpeg') }}" style="width:240px; height:135px; object-fit:cover; border:1px solid #c3c4c7; box-shadow:0 1px 3px rgba(0,0,0,0.1);" alt="Current Light Hero Bridge">
-                                    <div>
-                                        <input type="file" name="hero_image_light_file" accept="image/*">
-                                        <p class="description">Luminous architectural stone bridge in morning light for Light Theme. Recommended 1920x1080.</p>
+                                        <p class="description">Moody stone bridge with twilight sky & mist. Recommended 1920x1080.</p>
                                     </div>
                                 </div>
                             </td>
@@ -735,16 +723,6 @@
                             <th><label for="brand_name">Brand Name (Logo)</label></th>
                             <td>
                                 <input type="text" name="brand_name" id="brand_name" class="regular-text" value="{{ \App\Models\SiteSetting::get('brand_name') }}">
-                            </td>
-                        </tr>
-                        <tr>
-                            <th><label for="default_theme">Default Site Theme</label></th>
-                            <td>
-                                <select name="default_theme" id="default_theme" class="regular-text">
-                                    <option value="dark" {{ \App\Models\SiteSetting::get('default_theme', 'dark') === 'dark' ? 'selected' : '' }}>Dark Theme (Atmospheric Dusk & Stone Bridge)</option>
-                                    <option value="light" {{ \App\Models\SiteSetting::get('default_theme', 'dark') === 'light' ? 'selected' : '' }}>Light Theme (Luminous Alabaster & Morning Bridge)</option>
-                                </select>
-                                <p class="description">Initial default theme applied for new visitors.</p>
                             </td>
                         </tr>
                         <tr>
