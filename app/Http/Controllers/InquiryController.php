@@ -29,6 +29,20 @@ class InquiryController extends Controller
             'motivation' => 'nullable|string',
             'hp_note' => 'nullable|string',
             'form_rendered_at' => 'nullable|integer',
+        ], [
+            'full_name.required' => 'Please enter your full name.',
+            'full_name.max' => 'Full name must be under 255 characters.',
+            'email.required' => 'Please enter your email address.',
+            'email.email' => 'That email address does not look valid — please check it.',
+            'email.max' => 'Email address must be under 255 characters.',
+            'phone.max' => 'Phone number must be under 50 characters.',
+            'circumstances.required' => 'Please add a brief description of your circumstances.',
+        ], [
+            'full_name' => 'Full name',
+            'email' => 'Email address',
+            'phone' => 'Phone number',
+            'circumstances' => 'Circumstances',
+            'motivation' => 'Motivation',
         ]);
 
         // Too-fast submissions are almost always bots, but a real visitor testing

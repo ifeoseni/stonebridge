@@ -641,6 +641,28 @@
         display: none;
         border-radius: 2px;
     }
+    .alert-inquiry.error {
+        border-color: #e5484d;
+        background: rgba(229, 72, 77, 0.12);
+        color: #ffd7d7;
+    }
+    .alert-inquiry.success {
+        border-color: var(--gold-accent);
+        background: var(--gold-subtle);
+        color: var(--gold-text);
+    }
+    .floating-input.input-error {
+        border-color: #e5484d !important;
+        box-shadow: 0 0 0 2px rgba(229, 72, 77, 0.25) !important;
+    }
+    .field-error-msg {
+        display: none;
+        font-size: 12px;
+        color: #ff9d9d;
+        margin-top: 6px;
+        letter-spacing: 0.02em;
+    }
+    .field-error-msg.visible { display: block; }
 
     /* ==========================================================================
        SECTION 7: FOOTER
@@ -1029,26 +1051,32 @@
                         <div class="form-floating-group">
                             <input type="text" name="full_name" id="inq_full_name" class="floating-input" placeholder=" " required>
                             <label for="inq_full_name" class="floating-label">{{ $settings['inquiry_placeholder_name'] ?? 'Full Name' }}</label>
+                            <span class="field-error-msg" id="err_full_name"></span>
                         </div>
                         <div class="form-floating-group">
                             <input type="email" name="email" id="inq_email" class="floating-input" placeholder=" " required>
                             <label for="inq_email" class="floating-label">{{ $settings['inquiry_placeholder_email'] ?? 'Email Address' }}</label>
+                            <span class="field-error-msg" id="err_email"></span>
                         </div>
                         <div class="form-floating-group">
                             <input type="tel" name="phone" id="inq_phone" class="floating-input" placeholder=" ">
                             <label for="inq_phone" class="floating-label">{{ $settings['inquiry_placeholder_phone'] ?? 'Phone Number' }}</label>
+                            <span class="field-error-msg" id="err_phone"></span>
                         </div>
                     </div>
 
                     <div class="form-floating-group">
                         <input type="text" name="circumstances" id="inq_circumstances" class="floating-input" placeholder=" " required>
                         <label for="inq_circumstances" class="floating-label">{{ $settings['inquiry_placeholder_circumstances'] ?? 'Brief description of your circumstances' }}</label>
+                        <span class="field-error-msg" id="err_circumstances"></span>
                     </div>
 
                     <div class="form-floating-group">
                         <input type="text" name="motivation" id="inq_motivation" class="floating-input" placeholder=" ">
                         <label for="inq_motivation" class="floating-label">{{ $settings['inquiry_placeholder_motivation'] ?? 'What led you to explore this type of relationship?' }}</label>
+                        <span class="field-error-msg" id="err_motivation"></span>
                     </div>
+                    <span class="field-error-msg" id="err_form"></span>
 
                     <div class="inquiry-footer-row">
                         <div class="lock-notice">
@@ -1090,10 +1118,64 @@
     const btn = document.getElementById('submitBtn');
     const inquiryText = {
         sending: {{ Illuminate\Support\Js::from($settings['inquiry_sending_label'] ?? 'TRANSMITTING...') }},
-        validationError: {{ Illuminate\Support\Js::from($settings['inquiry_validation_error'] ?? 'Please check required fields.') }},
+        validationError: {{ Illuminate\Support\Js::from($settings['inquiry_validation_error'] ?? 'Please fix the highlighted fields below.') }},
         serverError: {{ Illuminate\Support\Js::from($settings['inquiry_server_error'] ?? 'We could not send your inquiry. Please try again in a moment — your message was not lost, nothing was recorded yet.') }},
-        rateLimited: {{ Illuminate\Support\Js::from($settings['inquiry_rate_limited'] ?? 'Too many attempts. Please wait a moment and try again.') }}
+        rateLimited: {{ Illuminate\Support\Js::from($settings['inquiry_rate_limited'] ?? 'Too many attempts. Please wait a minute and try again.') }},
+        sessionExpired: 'Your session expired. Please refresh the page and try again.'
     };
+    const fieldLabels = {
+        full_name: 'Full name',
+        email: 'Email address',
+        phone: 'Phone number',
+        circumstances: 'Circumstances',
+        motivation: 'Motivation',
+        form: 'Form'
+    };
+    const fieldInputs = {
+        full_name: document.getElementById('inq_full_name'),
+        email: document.getElementById('inq_email'),
+        phone: document.getElementById('inq_phone'),
+        circumstances: document.getElementById('inq_circumstances'),
+        motivation: document.getElementById('inq_motivation')
+    };
+
+    function clearFieldErrors() {
+        document.querySelectorAll('.field-error-msg').forEach(el => {
+            el.innerText = '';
+            el.classList.remove('visible');
+        });
+        document.querySelectorAll('.floating-input.input-error').forEach(el => el.classList.remove('input-error'));
+    }
+
+    function showBanner(message, type) {
+        alertBox.innerText = message;
+        alertBox.classList.remove('error', 'success');
+        if (type) alertBox.classList.add(type);
+        alertBox.style.display = 'block';
+    }
+
+    function showFieldErrors(errors) {
+        clearFieldErrors();
+        const parts = [];
+        let firstInput = null;
+        Object.entries(errors).forEach(([field, messages]) => {
+            const text = Array.isArray(messages) ? messages.join(' ') : String(messages);
+            const label = fieldLabels[field] || field;
+            parts.push(label + ': ' + text);
+            const errEl = document.getElementById('err_' + field);
+            if (errEl) {
+                errEl.innerText = text;
+                errEl.classList.add('visible');
+            }
+            const input = fieldInputs[field];
+            if (input) {
+                input.classList.add('input-error');
+                if (!firstInput) firstInput = input;
+            }
+        });
+        showBanner(parts.join(' | ') || inquiryText.validationError, 'error');
+        if (firstInput) firstInput.focus();
+    }
 
     if (form) {
         // Stamp render time in the visitor's browser so the anti-bot timer
@@ -1103,8 +1185,18 @@
             renderedAtField.value = Math.floor(Date.now() / 1000);
         }
 
+        // Clear a field's error as soon as the visitor fixes it.
+        Object.values(fieldInputs).forEach(input => {
+            if (input) input.addEventListener('input', () => {
+                input.classList.remove('input-error');
+                const errEl = document.getElementById('err_' + input.name);
+                if (errEl) { errEl.innerText = ''; errEl.classList.remove('visible'); }
+            });
+        });
+
         form.addEventListener('submit', function(e) {
             e.preventDefault();
+            clearFieldErrors();
             const originalLabel = btn.innerText;
             btn.innerText = inquiryText.sending;
             btn.disabled = true;
@@ -1114,6 +1206,7 @@
             fetch(form.action, {
                 method: 'POST',
                 body: formData,
+                credentials: 'same-origin',
                 headers: {
                     'X-Requested-With': 'XMLHttpRequest',
                     'Accept': 'application/json'
@@ -1131,33 +1224,37 @@
                 btn.innerText = originalLabel;
                 btn.disabled = false;
                 if (ok && data.success) {
-                    alertBox.innerText = data.message;
-                    alertBox.style.display = 'block';
+                    showBanner(data.message, 'success');
                     form.reset();
                     if (renderedAtField) {
                         renderedAtField.value = Math.floor(Date.now() / 1000);
                     }
-                } else if (status === 429) {
-                    alertBox.innerText = data.message || inquiryText.rateLimited;
-                    alertBox.style.display = 'block';
-                } else if (data.errors) {
-                    alertBox.innerText = Object.values(data.errors).flat().join(' ');
-                    alertBox.style.display = 'block';
-                } else if (data.message) {
-                    alertBox.innerText = data.message;
-                    alertBox.style.display = 'block';
-                } else {
-                    // 419 CSRF, 500 HTML, empty body, etc: NEVER claim success.
-                    alertBox.innerText = status >= 500 ? inquiryText.serverError : inquiryText.validationError;
-                    alertBox.style.display = 'block';
+                    return;
                 }
+                if (status === 419) {
+                    showBanner(inquiryText.sessionExpired, 'error');
+                    return;
+                }
+                if (status === 429) {
+                    showBanner(data.message || inquiryText.rateLimited, 'error');
+                    return;
+                }
+                if (data.errors && Object.keys(data.errors).length) {
+                    showFieldErrors(data.errors);
+                    return;
+                }
+                if (data.message) {
+                    showBanner(data.message, 'error');
+                    return;
+                }
+                // Empty / HTML response: NEVER claim success, say what happened.
+                showBanner(status >= 500 ? inquiryText.serverError + ' (code ' + status + ')' : inquiryText.validationError + ' (code ' + status + ')', 'error');
             })
             .catch(err => {
                 btn.innerText = originalLabel;
                 btn.disabled = false;
                 // Network failure or unparsable response: show an ERROR, keep the form.
-                alertBox.innerText = inquiryText.serverError;
-                alertBox.style.display = 'block';
+                showBanner(inquiryText.serverError, 'error');
             });
         });
     }
