@@ -1023,7 +1023,7 @@
                         <label for="inq_hp_note">Leave this field blank</label>
                         <input type="text" name="hp_note" id="inq_hp_note" tabindex="-1" autocomplete="off">
                     </div>
-                    <input type="hidden" name="form_rendered_at" value="{{ now()->timestamp }}">
+                    <input type="hidden" name="form_rendered_at" id="formRenderedAt" value="{{ now()->timestamp }}">
 
                     <div class="inquiry-row-3">
                         <div class="form-floating-group">
@@ -1091,10 +1091,18 @@
     const inquiryText = {
         sending: {{ Illuminate\Support\Js::from($settings['inquiry_sending_label'] ?? 'TRANSMITTING...') }},
         validationError: {{ Illuminate\Support\Js::from($settings['inquiry_validation_error'] ?? 'Please check required fields.') }},
-        fallbackSuccess: {{ Illuminate\Support\Js::from($settings['inquiry_fallback_success'] ?? 'Your confidential inquiry has been recorded. Thank you.') }}
+        serverError: {{ Illuminate\Support\Js::from($settings['inquiry_server_error'] ?? 'We could not send your inquiry. Please try again in a moment — your message was not lost, nothing was recorded yet.') }},
+        rateLimited: {{ Illuminate\Support\Js::from($settings['inquiry_rate_limited'] ?? 'Too many attempts. Please wait a moment and try again.') }}
     };
 
     if (form) {
+        // Stamp render time in the visitor's browser so the anti-bot timer
+        // measures real fill time (server-rendered value can be stale when cached).
+        const renderedAtField = document.getElementById('formRenderedAt');
+        if (renderedAtField) {
+            renderedAtField.value = Math.floor(Date.now() / 1000);
+        }
+
         form.addEventListener('submit', function(e) {
             e.preventDefault();
             const originalLabel = btn.innerText;
@@ -1111,31 +1119,45 @@
                     'Accept': 'application/json'
                 }
             })
-            .then(res => res.json().then(data => ({ status: res.status, data })))
-            .then(({ status, data }) => {
+            .then(async (res) => {
+                const contentType = res.headers.get('content-type') || '';
+                let data = {};
+                if (contentType.includes('application/json')) {
+                    try { data = await res.json(); } catch (_) { data = {}; }
+                }
+                return { status: res.status, ok: res.ok, data };
+            })
+            .then(({ status, ok, data }) => {
                 btn.innerText = originalLabel;
                 btn.disabled = false;
-                if (data.success) {
+                if (ok && data.success) {
                     alertBox.innerText = data.message;
                     alertBox.style.display = 'block';
                     form.reset();
+                    if (renderedAtField) {
+                        renderedAtField.value = Math.floor(Date.now() / 1000);
+                    }
+                } else if (status === 429) {
+                    alertBox.innerText = data.message || inquiryText.rateLimited;
+                    alertBox.style.display = 'block';
                 } else if (data.errors) {
                     alertBox.innerText = Object.values(data.errors).flat().join(' ');
                     alertBox.style.display = 'block';
-                } else if (status === 429) {
-                    alertBox.innerText = data.message || 'Too many attempts. Please wait a moment and try again.';
+                } else if (data.message) {
+                    alertBox.innerText = data.message;
                     alertBox.style.display = 'block';
                 } else {
-                    alertBox.innerText = inquiryText.validationError;
+                    // 419 CSRF, 500 HTML, empty body, etc: NEVER claim success.
+                    alertBox.innerText = status >= 500 ? inquiryText.serverError : inquiryText.validationError;
                     alertBox.style.display = 'block';
                 }
             })
             .catch(err => {
                 btn.innerText = originalLabel;
                 btn.disabled = false;
-                alertBox.innerText = inquiryText.fallbackSuccess;
+                // Network failure or unparsable response: show an ERROR, keep the form.
+                alertBox.innerText = inquiryText.serverError;
                 alertBox.style.display = 'block';
-                form.reset();
             });
         });
     }

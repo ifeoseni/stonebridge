@@ -31,11 +31,32 @@ class InquiryController extends Controller
             'form_rendered_at' => 'nullable|integer',
         ]);
 
+        // Too-fast submissions are almost always bots, but a real visitor testing
+        // quickly would otherwise lose their message silently. Ask them to retry
+        // instead of faking success — the second attempt will pass the timer.
+        $elapsed = $this->secondsSinceRendered($validated);
+        if ($elapsed !== null && $elapsed < self::MIN_FILL_SECONDS && ! $this->isSilentSpam($validated)) {
+            Log::info('Private Inquiry submitted too quickly, asking to retry.', [
+                'ip' => $request->ip(),
+                'elapsed_seconds' => $elapsed,
+            ]);
+
+            if ($request->wantsJson() || $request->ajax()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Please take a moment to complete the form, then submit again.',
+                    'errors' => ['form' => ['Please take a moment to complete the form, then submit again.']],
+                ], 422);
+            }
+
+            return back()->withErrors(['form' => 'Please take a moment to complete the form, then submit again.'])->withInput();
+        }
+
         if ($this->looksLikeSpam($request, $validated)) {
             Log::info('Private Inquiry submission rejected as spam.', [
                 'ip' => $request->ip(),
                 'honeypot_filled' => filled($validated['hp_note'] ?? null),
-                'elapsed_seconds' => $this->secondsSinceRendered($validated),
+                'elapsed_seconds' => $elapsed,
             ]);
 
             // Respond as if it succeeded so automated senders don't adapt or retry.
@@ -49,22 +70,46 @@ class InquiryController extends Controller
             return back()->with('success', 'Your inquiry has been received with strict confidentiality.');
         }
 
-        $inquiry = PrivateInquiry::create([
-            'full_name' => $validated['full_name'],
-            'email' => $validated['email'],
-            'phone' => $validated['phone'] ?? null,
-            'circumstances' => $validated['circumstances'],
-            'motivation' => $validated['motivation'] ?? null,
-            'status' => 'new',
-        ]);
+        try {
+            $inquiry = PrivateInquiry::create([
+                'full_name' => $validated['full_name'],
+                'email' => $validated['email'],
+                'phone' => $validated['phone'] ?? null,
+                'circumstances' => $validated['circumstances'],
+                'motivation' => $validated['motivation'] ?? null,
+                'status' => 'new',
+            ]);
+        } catch (\Throwable $e) {
+            Log::error('Failed to save Private Inquiry: ' . $e->getMessage(), [
+                'exception' => $e,
+            ]);
 
-        // Dispatch Email Notification to configured contact recipient
+            if ($request->wantsJson() || $request->ajax()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'We could not save your inquiry. Please try again in a moment.',
+                ], 500);
+            }
+
+            return back()->withErrors(['form' => 'We could not save your inquiry. Please try again.'])->withInput();
+        }
+
+        // Dispatch Email Notification to configured contact recipient.
+        // The inquiry is already saved at this point; a mail failure must
+        // never look like a form failure — it is only logged.
+        $mailSent = true;
         try {
             $recipient = config('mail.contact_recipient', config('mail.from.address'));
             if (!empty($recipient)) {
                 Mail::to($recipient)->send(new PrivateInquiryReceivedMail($inquiry));
+            } else {
+                $mailSent = false;
+                Log::warning('Private Inquiry saved but no contact recipient configured.', [
+                    'inquiry_id' => $inquiry->id,
+                ]);
             }
         } catch (\Throwable $e) {
+            $mailSent = false;
             Log::error('Failed to dispatch Private Inquiry email notification: ' . $e->getMessage(), [
                 'inquiry_id' => $inquiry->id,
                 'exception' => $e,
@@ -76,6 +121,7 @@ class InquiryController extends Controller
                 'success' => true,
                 'message' => 'Your inquiry has been received with strict confidentiality. Carl Malmsten will review it personally and respond in due course.',
                 'id' => $inquiry->id,
+                'mail_sent' => $mailSent,
             ]);
         }
 
@@ -87,14 +133,27 @@ class InquiryController extends Controller
      */
     private function looksLikeSpam(Request $request, array $validated): bool
     {
-        // 1. Honeypot: a field real visitors never see or fill, but form-filling bots do.
-        if (filled($validated['hp_note'] ?? null)) {
+        if ($this->isSilentSpam($validated)) {
             return true;
         }
 
         // 2. Time trap: genuine visitors need at least a few seconds to read and type; bots submit instantly.
         $elapsed = $this->secondsSinceRendered($validated);
         if ($elapsed !== null && $elapsed < self::MIN_FILL_SECONDS) {
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * Definite bot signals (honeypot filled or link flooding). These keep the
+     * silent fake-success response. A too-fast submit alone is retryable.
+     */
+    private function isSilentSpam(array $validated): bool
+    {
+        // 1. Honeypot: a field real visitors never see or fill, but form-filling bots do.
+        if (filled($validated['hp_note'] ?? null)) {
             return true;
         }
 
