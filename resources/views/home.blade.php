@@ -1036,7 +1036,7 @@
             <div>
                 <div id="inquiryAlert" class="alert-inquiry"></div>
 
-                <form id="inquiryForm" class="inquiry-form-wrapper" method="POST" action="{{ route('inquiry.store') }}">
+                <form id="inquiryForm" class="inquiry-form-wrapper" method="POST" action="/inquiry">
                     @csrf
 
                     {{-- Honeypot: invisible to real visitors, irresistible to bots. Left blank by humans, filled by scripts.
@@ -1237,6 +1237,11 @@
                 }
                 if (status === 429) {
                     showBanner(data.message || inquiryText.rateLimited, 'error');
+                    return;
+                }
+                if (status === 404) {
+                    console.error('Inquiry POST 404. Attempted URL:', form.action);
+                    showBanner('Form address not found (404). Please refresh the page — if it persists, the latest site code is not live on this server yet.', 'error');
                     return;
                 }
                 if (data.errors && Object.keys(data.errors).length) {
