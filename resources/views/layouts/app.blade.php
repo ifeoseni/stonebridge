@@ -5,6 +5,27 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
+    {{-- ============ Analytics: Google tag + Microsoft Clarity (production only) ============ --}}
+    @production
+        <!-- Google tag (gtag.js) -->
+        <script async src="https://www.googletagmanager.com/gtag/js?id=G-JJN5BF1NZV"></script>
+        <script>
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+
+            gtag('config', 'G-JJN5BF1NZV');
+        </script>
+        <!-- Microsoft Clarity -->
+        <script type="text/javascript">
+            (function(c,l,a,r,i,t,y){
+                c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
+                t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
+                y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+            })(window, document, "clarity", "script", "ywaa82xecp");
+        </script>
+    @endproduction
+
     {{-- ============ Primary SEO (per-page overrides via seo_* sections) ============ --}}
     <title>@yield('seo_title', ($settings['brand_name'] ?? 'STONEBRIDGE ADVISORY') . ' — Confidential Advisory')</title>
     <meta name="description" content="@yield('seo_description', $settings['hero_lead_1'] ?? 'Confidential advisory relationships for individuals navigating complex personal, relational, family, and leadership demands.')">

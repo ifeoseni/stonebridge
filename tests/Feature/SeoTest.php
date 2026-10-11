@@ -104,4 +104,24 @@ class SeoTest extends TestCase
         // Guests funnel back toward the admin login via the auth middleware.
         $response->assertRedirect(route('admin.dashboard'));
     }
+
+    public function test_analytics_tags_render_in_production_only(): void
+    {
+        $this->seed();
+
+        // Staging / local / testing: no tracking scripts.
+        $this->get(route('home'))
+            ->assertStatus(200)
+            ->assertDontSee('googletagmanager.com', false)
+            ->assertDontSee('clarity.ms', false);
+
+        // Production: Google tag + Clarity both present.
+        $this->app->detectEnvironment(fn () => 'production');
+
+        $this->get(route('home'))
+            ->assertStatus(200)
+            ->assertSee('googletagmanager.com/gtag/js?id=G-JJN5BF1NZV', false)
+            ->assertSee('clarity.ms/tag/', false)
+            ->assertSee('ywaa82xecp', false);
+    }
 }
