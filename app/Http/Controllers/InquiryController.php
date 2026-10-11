@@ -48,8 +48,11 @@ class InquiryController extends Controller
         // Too-fast submissions are almost always bots, but a real visitor testing
         // quickly would otherwise lose their message silently. Ask them to retry
         // instead of faking success — the second attempt will pass the timer.
+        // (Submissions already flagged as spam/scam below skip the retry and
+        // go straight to quarantine.)
         $elapsed = $this->secondsSinceRendered($validated);
-        if ($elapsed !== null && $elapsed < self::MIN_FILL_SECONDS && ! $this->isSilentSpam($validated)) {
+        $spamReason = $this->spamReason($validated);
+        if ($elapsed !== null && $elapsed < self::MIN_FILL_SECONDS && $spamReason === null) {
             Log::info('Private Inquiry submitted too quickly, asking to retry.', [
                 'ip' => $request->ip(),
                 'elapsed_seconds' => $elapsed,
@@ -66,12 +69,35 @@ class InquiryController extends Controller
             return back()->withErrors(['form' => 'Please take a moment to complete the form, then submit again.'])->withInput();
         }
 
-        if ($this->looksLikeSpam($request, $validated)) {
-            Log::info('Private Inquiry submission rejected as spam.', [
+        if ($spamReason !== null) {
+            Log::info('Private Inquiry submission flagged as spam.', [
                 'ip' => $request->ip(),
-                'honeypot_filled' => filled($validated['hp_note'] ?? null),
+                'spam_reason' => $spamReason,
                 'elapsed_seconds' => $elapsed,
             ]);
+
+            // Quarantine mode (default): keep the submission in the database
+            // so it can be reviewed in the admin inbox — but NEVER send an
+            // email notification for it. Flip INQUIRY_STORE_SPAM=false to
+            // silently discard spam instead (nothing stored).
+            if (config('inquiry.store_spam', true)) {
+                try {
+                    PrivateInquiry::create([
+                        'full_name' => $validated['full_name'],
+                        'email' => $validated['email'],
+                        'phone' => $validated['phone'] ?? null,
+                        'circumstances' => $validated['circumstances'],
+                        'motivation' => $validated['motivation'] ?? null,
+                        'status' => 'new',
+                        'is_spam' => true,
+                        'spam_reason' => $spamReason,
+                    ]);
+                } catch (\Throwable $e) {
+                    Log::error('Failed to quarantine spam Private Inquiry: ' . $e->getMessage(), [
+                        'exception' => $e,
+                    ]);
+                }
+            }
 
             // Respond as if it succeeded so automated senders don't adapt or retry.
             if ($request->wantsJson() || $request->ajax()) {
@@ -143,38 +169,70 @@ class InquiryController extends Controller
     }
 
     /**
-     * Lightweight, dependency-free spam screen: honeypot, minimum fill time, and a link-flooding check.
+     * Definite spam/scam signals. Returns a short reason code for quarantine
+     * (stored on the record, no email sent), or null when clean.
+     *
+     * Signals: honeypot filled, link flooding, and classic advance-fee /
+     * phishing scam content (lottery, inheritance, wire transfers, ...).
      */
-    private function looksLikeSpam(Request $request, array $validated): bool
-    {
-        if ($this->isSilentSpam($validated)) {
-            return true;
-        }
-
-        // 2. Time trap: genuine visitors need at least a few seconds to read and type; bots submit instantly.
-        $elapsed = $this->secondsSinceRendered($validated);
-        if ($elapsed !== null && $elapsed < self::MIN_FILL_SECONDS) {
-            return true;
-        }
-
-        return false;
-    }
-
-    /**
-     * Definite bot signals (honeypot filled or link flooding). These keep the
-     * silent fake-success response. A too-fast submit alone is retryable.
-     */
-    private function isSilentSpam(array $validated): bool
+    private function spamReason(array $validated): ?string
     {
         // 1. Honeypot: a field real visitors never see or fill, but form-filling bots do.
         if (filled($validated['hp_note'] ?? null)) {
-            return true;
+            return 'honeypot';
         }
 
-        // 3. Link flooding: free-text fields stuffed with multiple URLs are almost always spam.
         $freeText = ($validated['circumstances'] ?? '') . ' ' . ($validated['motivation'] ?? '');
+
+        // 2. Link flooding: free-text fields stuffed with multiple URLs are almost always spam.
         if (preg_match_all('#https?://|www\.#i', $freeText) >= 2) {
-            return true;
+            return 'link_flooding';
+        }
+
+        // 3. Scam content: classic fraud / phishing / money-mule markers.
+        if ($this->containsScamMarkers($freeText)) {
+            return 'scam_content';
+        }
+
+        return null;
+    }
+
+    /**
+     * Classic scam markers. A single strong marker (lottery win, inheritance
+     * payout, wire-transfer request, ...) quarantines immediately; weaker
+     * money-lure terms need at least two hits to avoid false positives on
+     * genuine family-office / portfolio inquiries.
+     */
+    private function containsScamMarkers(string $text): bool
+    {
+        $strong = [
+            'lottery', 'lotto', 'inheritance', 'beneficiary fund', 'wire transfer',
+            'western union', 'moneygram', 'gift card', 'double your money',
+            'guaranteed returns', 'urgent payment', 'bank login', 'account password',
+            'otp code', 'verification code', 'social security', 'claim your prize',
+            'transfer fee', 'release fee', 'customs fee',
+        ];
+
+        $weak = [
+            'crypto', 'bitcoin', 'btc', 'forex', 'trading signals',
+            'investment opportunity', 'loan offer', 'prize', 'winner',
+            'claim your', 'million dollars', 'offshore account', 'money transfer',
+            'risk-free', 'risk free',
+        ];
+
+        $lower = mb_strtolower($text);
+
+        foreach ($strong as $marker) {
+            if (str_contains($lower, $marker)) {
+                return true;
+            }
+        }
+
+        $hits = 0;
+        foreach ($weak as $marker) {
+            if (str_contains($lower, $marker) && ++$hits >= 2) {
+                return true;
+            }
         }
 
         return false;

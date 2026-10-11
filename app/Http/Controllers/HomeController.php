@@ -58,4 +58,34 @@ class HomeController extends Controller
             'slug' => $page->slug,
         ]);
     }
+
+    /**
+     * XML sitemap for search engines: homepage + published sub-pages.
+     */
+    public function sitemap()
+    {
+        $pages = SubPage::where('is_published', true)->orderBy('order')->get();
+
+        $urls = [
+            [
+                'loc' => route('home'),
+                'lastmod' => ($pages->max('updated_at') ?? now())->toAtomString(),
+                'changefreq' => 'weekly',
+                'priority' => '1.0',
+            ],
+        ];
+
+        foreach ($pages as $page) {
+            $urls[] = [
+                'loc' => route('page.show', $page->slug),
+                'lastmod' => $page->updated_at->toAtomString(),
+                'changefreq' => 'monthly',
+                'priority' => '0.8',
+            ];
+        }
+
+        return response()
+            ->view('sitemap', compact('urls'))
+            ->header('Content-Type', 'text/xml; charset=UTF-8');
+    }
 }

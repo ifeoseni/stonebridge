@@ -11,7 +11,18 @@
     <span class="status-pill status-{{ $inquiry->status }}" style="margin-left:12px; font-size:12px;">
         {{ ucfirst(str_replace('_', ' ', $inquiry->status)) }}
     </span>
+    @if($inquiry->is_spam)
+        <span class="status-pill status-spam" style="margin-left:8px; font-size:12px;" title="No email was sent for this submission.">
+            Spam{{ $inquiry->spam_reason ? ': ' . str_replace('_', ' ', $inquiry->spam_reason) : '' }}
+        </span>
+    @endif
     <hr class="wp-header-end" style="margin-bottom:20px; border:none;">
+
+    @if($inquiry->is_spam)
+        <div class="notice notice-warning">
+            <p><strong>Quarantined as spam{{ $inquiry->spam_reason ? ' (' . str_replace('_', ' ', $inquiry->spam_reason) . ')' : '' }}.</strong> No email notification was sent. Untick nothing — untick "still spam" below and update to restore it to the normal inbox.</p>
+        </div>
+    @endif
 
     <div style="display:grid; grid-template-columns: 2fr 1fr; gap:24px;">
         <!-- Left: Inquiry Content -->
@@ -78,6 +89,16 @@
                         <label for="admin_notes" style="display:block; font-weight:600; margin-bottom:6px;">Confidential Internal Notes:</label>
                         <textarea name="admin_notes" id="admin_notes" rows="6" class="large-text" placeholder="Add private notes regarding referral origin, schedule, or discretion parameters...">{{ $inquiry->admin_notes }}</textarea>
                     </div>
+
+                    @if($inquiry->is_spam)
+                        <div style="margin-bottom:20px;">
+                            <input type="hidden" name="is_spam" value="0">
+                            <label style="display:flex; align-items:center; gap:8px; font-size:13px; cursor:pointer;">
+                                <input type="checkbox" name="is_spam" value="1" checked>
+                                <span>Still spam (untick and update to restore to the normal inbox)</span>
+                            </label>
+                        </div>
+                    @endif
 
                     <button type="submit" class="button button-primary" style="width:100%;">Update Record</button>
                 </form>

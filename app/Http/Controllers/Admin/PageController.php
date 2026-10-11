@@ -37,10 +37,17 @@ class PageController extends Controller
             'subtitle' => 'nullable|string|max:255',
             'content' => 'required|string',
             'meta_description' => 'nullable|string',
-            'is_published' => 'boolean',
+            'is_published' => 'sometimes|boolean',
         ]);
 
         $slug = !empty($validated['slug']) ? Str::slug($validated['slug']) : Str::slug($validated['title']);
+
+        // Auto-generated slugs can still collide (e.g. two pages, same title).
+        $baseSlug = $slug;
+        $counter = 2;
+        while (SubPage::where('slug', $slug)->exists()) {
+            $slug = $baseSlug . '-' . $counter++;
+        }
 
         SubPage::create([
             'title' => $validated['title'],
@@ -48,8 +55,8 @@ class PageController extends Controller
             'subtitle' => $validated['subtitle'] ?? null,
             'content' => $validated['content'],
             'meta_description' => $validated['meta_description'] ?? null,
-            'is_published' => $request->has('is_published'),
-            'order' => SubPage::max('order') + 1,
+            'is_published' => $request->boolean('is_published'),
+            'order' => (SubPage::max('order') ?? 0) + 1,
         ]);
 
         return redirect()->route('admin.pages.index')->with('success', 'Page published successfully.');
@@ -77,6 +84,7 @@ class PageController extends Controller
             'subtitle' => 'nullable|string|max:255',
             'content' => 'required|string',
             'meta_description' => 'nullable|string',
+            'is_published' => 'sometimes|boolean',
         ]);
 
         $page->update([
@@ -85,7 +93,7 @@ class PageController extends Controller
             'subtitle' => $validated['subtitle'] ?? null,
             'content' => $validated['content'],
             'meta_description' => $validated['meta_description'] ?? null,
-            'is_published' => $request->has('is_published'),
+            'is_published' => $request->boolean('is_published'),
         ]);
 
         return redirect()->route('admin.pages.index')->with('success', 'Page updated successfully.');

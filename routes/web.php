@@ -12,14 +12,20 @@ use Illuminate\Support\Facades\Route;
 
 // Public Website Routes
 Route::get('/', [HomeController::class, 'index'])->name('home');
+Route::get('/sitemap.xml', [HomeController::class, 'sitemap'])->name('sitemap');
 Route::get('/page/{slug}', [HomeController::class, 'page'])->name('page.show');
 Route::get('/api/page/{slug}', [HomeController::class, 'pageJson'])->name('page.json');
 Route::post('/inquiry', [InquiryController::class, 'store'])->middleware('throttle:10,1')->name('inquiry.store');
 
 // Admin Authentication Routes
 Route::get('/admin/login', [AuthController::class, 'showLogin'])->name('admin.login');
-Route::post('/admin/login', [AuthController::class, 'login'])->name('admin.login.submit');
+Route::post('/admin/login', [AuthController::class, 'login'])->middleware('throttle:10,1')->name('admin.login.submit');
 Route::post('/admin/logout', [AuthController::class, 'logout'])->name('admin.logout');
+
+// Compatibility alias: Laravel's auth middleware / scaffolding and any
+// third-party code expects a route named "login". Point it at /admin/login
+// so `route('login')` never throws "Route [login] not defined".
+Route::get('/login', fn () => redirect()->route('admin.login'))->name('login');
 
 // Protected WordPress-Style Admin Panel Routes
 Route::middleware('auth')->prefix('admin')->name('admin.')->group(function () {

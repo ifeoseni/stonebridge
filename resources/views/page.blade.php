@@ -1,5 +1,30 @@
 @extends('layouts.app')
 
+@section('seo_title', $page->title . ' — ' . ($settings['brand_name'] ?? 'Stonebridge Advisory'))
+@section('seo_description', $page->meta_description ?? $page->subtitle ?? \Illuminate\Support\Str::limit(strip_tags(\Illuminate\Support\Str::markdown($page->content)), 155))
+@section('seo_canonical', route('page.show', $page->slug))
+@section('seo_type', 'article')
+
+@section('json_ld')
+<script type="application/ld+json">
+{!! json_encode([
+    '@context' => 'https://schema.org',
+    '@type' => 'WebPage',
+    'name' => $page->title,
+    'description' => $page->meta_description ?? $page->subtitle,
+    'url' => route('page.show', $page->slug),
+    'isPartOf' => ['@id' => url('/') . '#website'],
+    'breadcrumb' => [
+        '@type' => 'BreadcrumbList',
+        'itemListElement' => [
+            ['@type' => 'ListItem', 'position' => 1, 'name' => 'Home', 'item' => route('home')],
+            ['@type' => 'ListItem', 'position' => 2, 'name' => $page->title, 'item' => route('page.show', $page->slug)],
+        ],
+    ],
+], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE) !!}
+</script>
+@endsection
+
 @section('styles')
 <style>
     .container {

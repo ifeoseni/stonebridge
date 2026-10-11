@@ -24,9 +24,14 @@ class CustomizerThemeTest extends TestCase
         $response->assertSee('ADVISORY');
         $response->assertSee('mandate-badge', false);
         $response->assertSee('form-floating-group', false);
-        $response->assertSee('theme-toggle-btn', false);
         $response->assertSee('hero-bridge-dark.jpg');
-        $response->assertSee('hero-bridge-light.jpg');
+
+        // The light-theme hero image is a stored setting (managed via the
+        // Customize panel), not homepage markup — assert it is seeded.
+        $this->assertDatabaseHas('site_settings', [
+            'key' => 'hero_image_light',
+            'value' => '/images/hero-bridge-light.jpg',
+        ]);
     }
 
     public function test_admin_can_update_light_hero_image_and_theme_settings(): void

@@ -1,6 +1,14 @@
 @extends('layouts.app')
 
+@section('seo_title', ($settings['brand_name'] ?? 'STONEBRIDGE ADVISORY') . ' — Confidential Advisory for Complex Lives')
+@section('seo_description', ($settings['hero_lead_1'] ?? 'Confidential advisory relationships for individuals navigating complex personal, relational, family, and leadership demands.') . ' ' . ($settings['hero_lead_2'] ?? 'Supporting those whose circumstances call for continuity, discretion, and thoughtful guidance.'))
+@section('seo_canonical', route('home'))
+{{-- Social share image: the Carl Malmsten portrait shown left of the founder copy (line ~1015). --}}
+@section('seo_image', url('/storage/uploads/bglgAapIf4r8BkW4LrFdMXuIOrdZ1EPssi2yvU8x.jpg'))
+@section('seo_image_alt', 'Carl Malmsten, founder of Stonebridge Advisory')
+
 @section('styles')
+<link rel="preload" as="image" href="{{ $settings['hero_image'] ?? '/images/hero-bridge-dark.jpg' }}" fetchpriority="high">
 <style>
     /* ==========================================================================
        THEME DYNAMIC VARIABLES & BACKGROUNDS
@@ -855,10 +863,10 @@
     <!-- =========================================================================
          1. HERO SECTION (Minimalist Monumental Stone Bridge)
          ========================================================================= -->
-    <section class="hero-wrap" id="hero">
-        <div class="hero-bg-dark"></div>
-        <div class="hero-vignette-dark"></div>
-        <div class="hero-bottom-grad"></div>
+    <section class="hero-wrap" id="hero" aria-label="Stonebridge Advisory introduction">
+        <div class="hero-bg-dark" aria-hidden="true"></div>
+        <div class="hero-vignette-dark" aria-hidden="true"></div>
+        <div class="hero-bottom-grad" aria-hidden="true"></div>
 
         <div class="hero-inner">
             <h1 class="hero-title">{!! nl2br(e($settings['hero_title'] ?? "STONEBRIDGE\nADVISORY")) !!}</h1>
@@ -874,7 +882,7 @@
     <!-- =========================================================================
          1.5. THE STONEBRIDGE MANDATE & INVITATION (Subtext Architectural Band)
          ========================================================================= -->
-    <section class="mandate-wrap" id="mandate">
+    <section class="mandate-wrap" id="mandate" aria-label="The Stonebridge mandate">
         <div class="mandate-inner">
             <span class="mandate-badge">
                 {{ $settings['hero_badge'] ?? 'BY REFERRAL AND LIMITED INVITATION.' }}
@@ -893,7 +901,7 @@
     <!-- =========================================================================
          2. THE STONEBRIDGE APPROACH
          ========================================================================= -->
-    <section class="approach-wrap" id="approach">
+    <section class="approach-wrap" id="approach" aria-label="The Stonebridge approach">
         <div class="approach-flex">
             <div class="approach-header-col">
                 <span class="tag-gold">{{ $settings['approach_tag'] ?? 'THE STONEBRIDGE APPROACH' }}</span>
@@ -918,7 +926,7 @@
     <!-- =========================================================================
          3. WHO STONEBRIDGE SERVES (Warm Cream Card)
          ========================================================================= -->
-    <section class="serves-wrap" id="who-we-serve">
+    <section class="serves-wrap" id="who-we-serve" aria-label="Who Stonebridge serves">
         <div class="serves-flex">
             <div>
                 <span class="tag-bronze">{{ $settings['clientele_tag'] ?? 'WHO STONEBRIDGE SERVES' }}</span>
@@ -970,7 +978,7 @@
     <!-- =========================================================================
          4. RETAINER RELATIONSHIPS (Balanced List Stack on Mobile)
          ========================================================================= -->
-    <section class="retainer-wrap" id="retainers">
+    <section class="retainer-wrap" id="retainers" aria-label="Retainer relationships">
         <div class="retainer-content-side">
             <span class="tag-gold">{{ $settings['retainer_tag'] ?? 'RETAINER RELATIONSHIPS' }}</span>
             <div class="section-accent-line gold"></div>
@@ -997,16 +1005,16 @@
         </div>
 
         <div class="retainer-photo-side">
-            <img src="{{ $settings['retainer_image'] ?? '/images/retainer-interior.jpg' }}" alt="Stonebridge Sanctuary Interior">
+            <img src="{{ $settings['retainer_image'] ?? '/images/retainer-interior.jpg' }}" alt="Stonebridge Sanctuary Interior" loading="lazy" decoding="async">
         </div>
     </section>
 
     <!-- =========================================================================
          5. CARL MALMSTEN
          ========================================================================= -->
-    <section class="founder-wrap" id="carl-malmsten">
+    <section class="founder-wrap" id="carl-malmsten" aria-label="About Carl Malmsten">
         <div class="founder-photo-half">
-            <img src="{{ $settings['founder_image'] ?? '/images/carl-malmsten.jpg' }}" alt="Carl Malmsten Portrait">
+            <img src="{{ $settings['founder_image'] ?? '/images/carl-malmsten.jpg' }}" alt="Carl Malmsten Portrait" loading="lazy" decoding="async">
         </div>
 
         <div class="founder-card-half">
@@ -1023,7 +1031,7 @@
     <!-- =========================================================================
          6. PRIVATE INQUIRY (High Contrast Floating Labels)
          ========================================================================= -->
-    <section class="inquiry-wrap" id="private-inquiry">
+    <section class="inquiry-wrap" id="private-inquiry" aria-label="Private inquiry form">
         <div class="inquiry-flex">
             <div>
                 <span class="tag-gold">{{ $settings['inquiry_tag'] ?? 'PRIVATE INQUIRY' }}</span>
@@ -1036,7 +1044,7 @@
             <div>
                 <div id="inquiryAlert" class="alert-inquiry"></div>
 
-                <form id="inquiryForm" class="inquiry-form-wrapper" method="POST" action="/inquiry">
+                <form id="inquiryForm" class="inquiry-form-wrapper" method="POST" action="{{ route('inquiry.store') }}">
                     @csrf
 
                     {{-- Honeypot: invisible to real visitors, irresistible to bots. Left blank by humans, filled by scripts.

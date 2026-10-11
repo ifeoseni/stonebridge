@@ -13,6 +13,12 @@ class PrivateInquiry extends Model
         'circumstances',
         'motivation',
         'status',
+        'is_spam',
+        'spam_reason',
         'admin_notes',
+    ];
+
+    protected $casts = [
+        'is_spam' => 'boolean',
     ];
 }

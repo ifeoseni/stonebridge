@@ -15,8 +15,8 @@ class DashboardController extends Controller
     public function index()
     {
         $totalInquiries = PrivateInquiry::count();
-        $newInquiries = PrivateInquiry::where('status', 'new')->count();
-        $recentInquiries = PrivateInquiry::latest()->take(5)->get();
+        $newInquiries = PrivateInquiry::where('status', 'new')->where('is_spam', false)->count();
+        $recentInquiries = PrivateInquiry::where('is_spam', false)->latest()->take(5)->get();
         $subPagesCount = SubPage::count();
         $pillarsCount = ApproachPillar::count();
         $criteriaCount = ClienteleCriterion::count();

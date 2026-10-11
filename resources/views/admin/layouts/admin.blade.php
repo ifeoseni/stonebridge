@@ -393,6 +393,7 @@
         .status-contacted { background: #e3f2fd; color: #0d47a1; border: 1px solid #90caf9; }
         .status-in_review { background: #fff8e1; color: #f57f17; border: 1px solid #ffe082; }
         .status-archived { background: #f5f5f5; color: #616161; border: 1px solid #e0e0e0; }
+        .status-spam { background: #fdecea; color: #b3261e; border: 1px solid #f5c6c2; }
     </style>
     @yield('admin_styles')
 </head>
@@ -438,7 +439,7 @@
 
             <!-- Inquiries Counter -->
             @php
-                $unreadInquiries = \App\Models\PrivateInquiry::where('status', 'new')->count();
+                $unreadInquiries = \App\Models\PrivateInquiry::where('status', 'new')->where('is_spam', false)->count();
             @endphp
             <a href="{{ route('admin.inquiries.index') }}" class="wp-bar-item">
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -454,7 +455,7 @@
 
         <div class="wpadminbar-right">
             <a href="{{ route('admin.profile') }}" class="wp-bar-item" title="Edit Profile & Change Password">
-                Howdy, <strong>{{ Auth::user()->name ?? 'Carl Malmsten' }}</strong>
+                Howdy, <strong>{{ Auth::user()?->name ?? 'Admin' }}</strong>
             </a>
             <form action="{{ route('admin.logout') }}" method="POST" style="margin:0;">
                 @csrf

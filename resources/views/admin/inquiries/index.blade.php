@@ -31,9 +31,20 @@
         <li>
             <a href="{{ route('admin.inquiries.index', ['status' => 'archived']) }}" class="{{ $status === 'archived' ? 'current' : '' }}" style="{{ $status === 'archived' ? 'font-weight:600; color:#000;' : 'color:#2271b1; text-decoration:none;' }}">
                 Archived <span class="count">({{ $counts['archived'] }})</span>
+            </a> |
+        </li>
+        <li>
+            <a href="{{ route('admin.inquiries.index', ['status' => 'spam']) }}" class="{{ $status === 'spam' ? 'current' : '' }}" style="{{ $status === 'spam' ? 'font-weight:600; color:#000;' : 'color:#d63638; text-decoration:none;' }}">
+                Spam <span class="count">({{ $counts['spam'] }})</span>
             </a>
         </li>
     </ul>
+
+    @if(config('inquiry.store_spam', true))
+        <div class="notice notice-warning">
+            <p><strong>Spam quarantine is on:</strong> suspicious submissions are saved here with no email sent. To discard spam instead of storing it, set <code>INQUIRY_STORE_SPAM=false</code> in <code>.env</code>.</p>
+        </div>
+    @endif
 
     <div class="postbox" style="margin-top:12px;">
         <div class="inside" style="padding:0;">
@@ -72,6 +83,11 @@
                                     <span class="status-pill status-{{ $inq->status }}">
                                         {{ ucfirst(str_replace('_', ' ', $inq->status)) }}
                                     </span>
+                                    @if($inq->is_spam)
+                                        <span class="status-pill status-spam" title="Flagged: {{ $inq->spam_reason ?? 'spam' }}. No email was sent for this submission.">
+                                            Spam
+                                        </span>
+                                    @endif
                                 </td>
                                 <td>{{ $inq->created_at->format('M j, Y') }}</td>
                                 <td>
