@@ -21,6 +21,11 @@ return Application::configure(basePath: dirname(__DIR__))
         // "Route [login] not defined".
         $middleware->redirectGuestsTo(fn (Request $request) => route('admin.login'));
 
+        // The live site sits behind Cloudflare: without this, logs and the
+        // inquiry throttle see edge IPs shared by many visitors (causing
+        // false rate-limits) instead of real visitor IPs.
+        $middleware->trustProxies(at: '*');
+
         $middleware->validateCsrfTokens(except: [
             'inquiry',
         ]);

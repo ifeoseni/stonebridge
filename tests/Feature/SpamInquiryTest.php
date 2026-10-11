@@ -24,9 +24,11 @@ class SpamInquiryTest extends TestCase
             'hp_note' => 'I am a bot filling every field',
         ]);
 
-        // Still looks like success to the sender.
+        // Still looks like success to the sender — but must NOT promise
+        // Carl Malmsten's personal review.
         $response->assertStatus(200);
         $response->assertJson(['success' => true]);
+        $response->assertJsonPath('message', 'Your inquiry has been received. Thank you for contacting Stonebridge Advisory.');
 
         $record = PrivateInquiry::where('email', 'bot@spam-example.com')->first();
         $this->assertNotNull($record);
@@ -48,6 +50,7 @@ class SpamInquiryTest extends TestCase
 
         $response->assertStatus(200);
         $response->assertJson(['success' => true]);
+        $response->assertJsonPath('message', 'Your inquiry has been received. Thank you for contacting Stonebridge Advisory.');
 
         $record = PrivateInquiry::where('email', 'john.claims@example.com')->first();
         $this->assertNotNull($record);
@@ -69,6 +72,7 @@ class SpamInquiryTest extends TestCase
 
         $response->assertStatus(200);
         $response->assertJson(['success' => true]);
+        $response->assertJsonPath('message', 'Your inquiry has been received. Thank you for contacting Stonebridge Advisory.');
 
         $record = PrivateInquiry::where('email', 'links@spam-example.com')->first();
         $this->assertNotNull($record);
@@ -93,6 +97,7 @@ class SpamInquiryTest extends TestCase
         // Sender still sees success, but nothing is stored and no mail goes out.
         $response->assertStatus(200);
         $response->assertJson(['success' => true]);
+        $response->assertJsonPath('message', 'Your inquiry has been received. Thank you for contacting Stonebridge Advisory.');
 
         $this->assertDatabaseMissing('private_inquiries', [
             'email' => 'bot@spam-example.com',
@@ -115,6 +120,7 @@ class SpamInquiryTest extends TestCase
 
         $response->assertStatus(200);
         $response->assertJson(['success' => true]);
+        $response->assertJsonPath('message', 'Your inquiry has been received with strict confidentiality. Carl Malmsten will review it personally and respond in due course.');
 
         $record = PrivateInquiry::where('email', 'alexander.vance@example.com')->first();
         $this->assertNotNull($record);

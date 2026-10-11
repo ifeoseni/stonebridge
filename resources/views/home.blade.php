@@ -8,7 +8,6 @@
 @section('seo_image_alt', 'Carl Malmsten, founder of Stonebridge Advisory')
 
 @section('styles')
-<link rel="preload" as="image" href="{{ $settings['hero_image'] ?? '/images/hero-bridge-dark.jpg' }}" fetchpriority="high">
 <style>
     /* ==========================================================================
        THEME DYNAMIC VARIABLES & BACKGROUNDS
@@ -1124,6 +1123,9 @@
     const form = document.getElementById('inquiryForm');
     const alertBox = document.getElementById('inquiryAlert');
     const btn = document.getElementById('submitBtn');
+    // Measured on this device's own clock (load -> submit), so device/server
+    // clock skew cannot falsely flag a genuine visitor as "too fast".
+    const pageLoadTime = Date.now();
     const inquiryText = {
         sending: {{ Illuminate\Support\Js::from($settings['inquiry_sending_label'] ?? 'TRANSMITTING...') }},
         validationError: {{ Illuminate\Support\Js::from($settings['inquiry_validation_error'] ?? 'Please fix the highlighted fields below.') }},
@@ -1210,6 +1212,7 @@
             btn.disabled = true;
 
             const formData = new FormData(form);
+            formData.set('fill_seconds', Math.max(0, Math.round((Date.now() - pageLoadTime) / 1000)));
 
             fetch(form.action, {
                 method: 'POST',

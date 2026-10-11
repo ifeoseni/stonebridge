@@ -29,6 +29,7 @@ class InquiryController extends Controller
             'motivation' => 'nullable|string',
             'hp_note' => 'nullable|string',
             'form_rendered_at' => 'nullable|integer',
+            'fill_seconds' => 'nullable|integer|min:0|max:86400',
         ], [
             'full_name.required' => 'Please enter your full name.',
             'full_name.max' => 'Full name must be under 255 characters.',
@@ -45,17 +46,18 @@ class InquiryController extends Controller
             'motivation' => 'Motivation',
         ]);
 
-        // Too-fast submissions are almost always bots, but a real visitor testing
-        // quickly would otherwise lose their message silently. Ask them to retry
-        // instead of faking success — the second attempt will pass the timer.
+        // Too-fast submissions are almost always bots, but only when the timing
+        // signal is reliable. The retry fires ONLY on a trustworthy fast
+        // measurement — a missing or contradictory timer must never block a
+        // genuine visitor. The second attempt a few seconds later passes.
         // (Submissions already flagged as spam/scam below skip the retry and
         // go straight to quarantine.)
-        $elapsed = $this->secondsSinceRendered($validated);
+        $fillSeconds = $this->measuredFillSeconds($validated);
         $spamReason = $this->spamReason($validated);
-        if ($elapsed !== null && $elapsed < self::MIN_FILL_SECONDS && $spamReason === null) {
+        if ($spamReason === null && $fillSeconds !== null && $fillSeconds < self::MIN_FILL_SECONDS) {
             Log::info('Private Inquiry submitted too quickly, asking to retry.', [
                 'ip' => $request->ip(),
-                'elapsed_seconds' => $elapsed,
+                'fill_seconds' => $fillSeconds,
             ]);
 
             if ($request->wantsJson() || $request->ajax()) {
@@ -73,7 +75,7 @@ class InquiryController extends Controller
             Log::info('Private Inquiry submission flagged as spam.', [
                 'ip' => $request->ip(),
                 'spam_reason' => $spamReason,
-                'elapsed_seconds' => $elapsed,
+                'fill_seconds' => $fillSeconds,
             ]);
 
             // Quarantine mode (default): keep the submission in the database
@@ -100,14 +102,17 @@ class InquiryController extends Controller
             }
 
             // Respond as if it succeeded so automated senders don't adapt or retry.
+            // NOTE: deliberately NOT the standard "Carl Malmsten will review
+            // it personally" message — quarantined spam must never promise a
+            // personal review.
             if ($request->wantsJson() || $request->ajax()) {
                 return response()->json([
                     'success' => true,
-                    'message' => 'Your inquiry has been received with strict confidentiality. Carl Malmsten will review it personally and respond in due course.',
+                    'message' => 'Your inquiry has been received. Thank you for contacting Stonebridge Advisory.',
                 ]);
             }
 
-            return back()->with('success', 'Your inquiry has been received with strict confidentiality.');
+            return back()->with('success', 'Your inquiry has been received. Thank you for contacting Stonebridge Advisory.');
         }
 
         try {
@@ -238,14 +243,41 @@ class InquiryController extends Controller
         return false;
     }
 
-    private function secondsSinceRendered(array $validated): ?int
+    /**
+     * How long the visitor spent on the form, in seconds — or null when there
+     * is no trustworthy measurement.
+     *
+     * Primary signal: `fill_seconds`, measured in the visitor's own browser
+     * (page-load to submit on the same device clock, so device/server clock
+     * skew cancels out). Fallback: the server-rendered timestamp — but a
+     * timestamp in the future (visitor clock ahead of the server, the old
+     * false-positive that trapped real users at "0 seconds") or older than
+     * 24h (stale cached page) is ignored rather than punished.
+     */
+    private function measuredFillSeconds(array $validated): ?int
     {
-        $renderedAt = $validated['form_rendered_at'] ?? null;
+        if (array_key_exists('fill_seconds', $validated) && $validated['fill_seconds'] !== null) {
+            return max(0, (int) $validated['fill_seconds']);
+        }
 
-        if (!$renderedAt) {
+        $renderedAt = (int) ($validated['form_rendered_at'] ?? 0);
+
+        if ($renderedAt <= 0) {
             return null;
         }
 
-        return max(0, now()->timestamp - (int) $renderedAt);
+        $now = now()->timestamp;
+
+        if ($renderedAt > $now) {
+            return null;
+        }
+
+        $elapsed = $now - $renderedAt;
+
+        if ($elapsed > 86400) {
+            return null;
+        }
+
+        return $elapsed;
     }
 }
