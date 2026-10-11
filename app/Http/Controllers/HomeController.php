@@ -60,45 +60,25 @@ class HomeController extends Controller
     }
 
     /**
-     * XML sitemap for search engines: homepage + published sub-pages.
-     * Built as a raw string (not a Blade view) so the XML declaration can
-     * never break Blade compilation.
+     * XML sitemap for search engines.
+     *
+     * Intentionally homepage-only: sub-pages are hidden from ranking, so
+     * they stay out of the sitemap. Built as a raw string (not a Blade
+     * view) so the XML declaration can never break Blade compilation, and
+     * with no dependency on the page.show route so hiding sub-pages can
+     * never crash this endpoint.
      */
     public function sitemap()
     {
-        $pages = SubPage::where('is_published', true)->orderBy('order')->get();
-
-        $entries = [
-            [
-                'loc' => route('home'),
-                'lastmod' => ($pages->max('updated_at') ?? now())->toAtomString(),
-                'changefreq' => 'weekly',
-                'priority' => '1.0',
-            ],
-        ];
-
-        foreach ($pages as $page) {
-            $entries[] = [
-                'loc' => route('page.show', $page->slug),
-                'lastmod' => $page->updated_at->toAtomString(),
-                'changefreq' => 'monthly',
-                'priority' => '0.8',
-            ];
-        }
-
         $xml = '<' . '?xml version="1.0" encoding="UTF-8"?' . '>' . "\n"
-            . '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">' . "\n";
-
-        foreach ($entries as $entry) {
-            $xml .= '    <url>' . "\n"
-                . '        <loc>' . e($entry['loc']) . '</loc>' . "\n"
-                . '        <lastmod>' . e($entry['lastmod']) . '</lastmod>' . "\n"
-                . '        <changefreq>' . e($entry['changefreq']) . '</changefreq>' . "\n"
-                . '        <priority>' . e($entry['priority']) . '</priority>' . "\n"
-                . '    </url>' . "\n";
-        }
-
-        $xml .= '</urlset>';
+            . '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">' . "\n"
+            . '    <url>' . "\n"
+            . '        <loc>' . e(route('home')) . '</loc>' . "\n"
+            . '        <lastmod>' . e(now()->toAtomString()) . '</lastmod>' . "\n"
+            . '        <changefreq>weekly</changefreq>' . "\n"
+            . '        <priority>1.0</priority>' . "\n"
+            . '    </url>' . "\n"
+            . '</urlset>';
 
         return response($xml)->header('Content-Type', 'text/xml; charset=UTF-8');
     }

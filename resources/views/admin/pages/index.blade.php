@@ -47,7 +47,11 @@
                             <td>{{ $page->created_at->format('Y/m/d') }}</td>
                             <td>
                                 <div style="display:flex; gap:6px;">
-                                    <a href="{{ route('page.show', $page->slug) }}" target="_blank" class="button button-small">View</a>
+                                    @if(Route::has('page.show'))
+                                        <a href="{{ route('page.show', $page->slug) }}" target="_blank" class="button button-small">View</a>
+                                    @else
+                                        <span class="button button-small" disabled title="Sub-pages are hidden from the public site." style="opacity:0.5; cursor:not-allowed;">Hidden</span>
+                                    @endif
                                     <a href="{{ route('admin.pages.edit', $page->id) }}" class="button button-small">Edit</a>
                                     <form action="{{ route('admin.pages.destroy', $page->id) }}" method="POST" onsubmit="return confirm('Delete this page?');" style="display:inline;">
                                         @csrf

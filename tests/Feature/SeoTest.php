@@ -44,19 +44,24 @@ class SeoTest extends TestCase
         $response->assertSee('aria-label="Stonebridge Advisory introduction"', false);
     }
 
-    public function test_subpage_has_unique_seo_tags_and_breadcrumb_data(): void
+    public function test_hidden_subpage_url_redirects_home_with_error_toast(): void
     {
+        // Sub-pages are hidden from ranking (page.show route disabled):
+        // old /page/* URLs land back on the homepage with a toast.
         $this->seed();
 
-        $response = $this->get(route('page.show', 'discretion-charter'));
+        $response = $this->get('/page/discretion-charter');
 
-        $response->assertStatus(200);
-        $response->assertSee('Charter of Discretion', false);
-        $response->assertSee(route('page.show', 'discretion-charter'), false);
-        $response->assertSee('BreadcrumbList', false);
+        $response->assertRedirect(route('home'));
+
+        $followed = $this->followingRedirects()->get('/page/discretion-charter');
+
+        $followed->assertStatus(200);
+        $followed->assertSee('id="sb-toast"', false);
+        $followed->assertSee('could not be found', false);
     }
 
-    public function test_sitemap_returns_valid_xml_with_home_and_pages(): void
+    public function test_sitemap_returns_valid_xml_with_home_only(): void
     {
         $this->seed();
 
@@ -70,7 +75,9 @@ class SeoTest extends TestCase
         $this->assertStringStartsWith($declaration, $response->getContent());
         $response->assertSee('<urlset', false);
         $response->assertSee(route('home'), false);
-        $response->assertSee(route('page.show', 'discretion-charter'), false);
+        // Sub-pages are deliberately hidden from ranking: never in the sitemap,
+        // so hiding the page route can never crash this endpoint.
+        $response->assertDontSee('/page/', false);
     }
 
     public function test_unknown_url_redirects_home_with_error_toast(): void

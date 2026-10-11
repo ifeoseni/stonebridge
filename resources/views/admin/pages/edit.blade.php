@@ -5,7 +5,11 @@
 @section('admin_content')
     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
         <h1 class="wp-heading-inline">Edit Page &mdash; {{ $page->title }}</h1>
-        <a href="{{ route('page.show', $page->slug) }}" target="_blank" class="button">View Page</a>
+        @if(Route::has('page.show'))
+            <a href="{{ route('page.show', $page->slug) }}" target="_blank" class="button">View Page</a>
+        @else
+            <span class="button" disabled title="Sub-pages are hidden from the public site." style="opacity:0.5; cursor:not-allowed;">Hidden from public site</span>
+        @endif
     </div>
     <hr class="wp-header-end" style="margin-bottom:20px; border:none;">
 
