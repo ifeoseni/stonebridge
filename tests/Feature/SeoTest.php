@@ -23,6 +23,18 @@ class SeoTest extends TestCase
         $response->assertSee('name="robots"', false);
         $response->assertSee('application/ld+json', false);
         $response->assertSee('Organization', false);
+        // Structured data must be VALID JSON with a proper @context key —
+        // guards the Blade-directive regression that once leaked compiled
+        // PHP into the script block on the live server.
+        $html = $response->getContent();
+        $this->assertMatchesRegularExpression(
+            '#<script type="application/ld\+json">\s*(\{.*?\})\s*</script>#s',
+            $html
+        );
+        preg_match('#<script type="application/ld\+json">\s*(\{.*?\})\s*</script>#s', $html, $matches);
+        $structured = json_decode($matches[1], true);
+        $this->assertIsArray($structured, 'JSON-LD block is not valid JSON.');
+        $this->assertSame('https://schema.org', $structured['@context'] ?? null);
         // Social share image: the Carl Malmsten portrait (uploads file).
         $response->assertSee('/storage/uploads/bglgAapIf4r8BkW4LrFdMXuIOrdZ1EPssi2yvU8x.jpg', false);
         $response->assertSee('property="og:image:alt"', false);
@@ -52,6 +64,10 @@ class SeoTest extends TestCase
 
         $response->assertStatus(200);
         $response->assertHeader('Content-Type', 'text/xml; charset=UTF-8');
+        // Guards the Blade `?` + `>`-in-echo regression: the declaration must be intact.
+        // (Built via concatenation so this very file never contains a literal close tag.)
+        $declaration = '<' . '?xml version="1.0" encoding="UTF-8"?' . '>';
+        $this->assertStringStartsWith($declaration, $response->getContent());
         $response->assertSee('<urlset', false);
         $response->assertSee(route('home'), false);
         $response->assertSee(route('page.show', 'discretion-charter'), false);

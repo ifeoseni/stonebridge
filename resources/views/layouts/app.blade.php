@@ -19,6 +19,8 @@
     <meta property="og:description" content="@yield('seo_description', $settings['hero_lead_1'] ?? 'Confidential advisory relationships for individuals navigating complex personal, relational, family, and leadership demands.')">
     <meta property="og:url" content="@yield('seo_canonical', url()->current())">
     <meta property="og:image" content="@yield('seo_image', url('/storage/uploads/bglgAapIf4r8BkW4LrFdMXuIOrdZ1EPssi2yvU8x.jpg'))">
+    <meta property="og:image:secure_url" content="@yield('seo_image', url('/storage/uploads/bglgAapIf4r8BkW4LrFdMXuIOrdZ1EPssi2yvU8x.jpg'))">
+    <meta property="og:image:type" content="image/jpeg">
     <meta property="og:image:alt" content="@yield('seo_image_alt', 'Stonebridge Advisory — Confidential Advisory')">
 
     {{-- ============ Twitter Card ============ --}}
@@ -39,9 +41,10 @@
     <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,500&family=Plus+Jakarta+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 
     {{-- ============ Structured Data: Organization + WebSite ============ --}}
+    {{-- NOTE: '@' . 'context' is concatenated so Blade never parses it as a directive. --}}
     <script type="application/ld+json">
     {!! json_encode([
-        '@context' => 'https://schema.org',
+        '@' . 'context' => 'https://schema.org',
         '@graph' => [
             [
                 '@type' => 'Organization',

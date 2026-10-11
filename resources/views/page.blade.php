@@ -8,7 +8,7 @@
 @section('json_ld')
 <script type="application/ld+json">
 {!! json_encode([
-    '@context' => 'https://schema.org',
+    '@' . 'context' => 'https://schema.org',
     '@type' => 'WebPage',
     'name' => $page->title,
     'description' => $page->meta_description ?? $page->subtitle,

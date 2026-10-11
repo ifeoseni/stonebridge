@@ -61,12 +61,14 @@ class HomeController extends Controller
 
     /**
      * XML sitemap for search engines: homepage + published sub-pages.
+     * Built as a raw string (not a Blade view) so the XML declaration can
+     * never break Blade compilation.
      */
     public function sitemap()
     {
         $pages = SubPage::where('is_published', true)->orderBy('order')->get();
 
-        $urls = [
+        $entries = [
             [
                 'loc' => route('home'),
                 'lastmod' => ($pages->max('updated_at') ?? now())->toAtomString(),
@@ -76,7 +78,7 @@ class HomeController extends Controller
         ];
 
         foreach ($pages as $page) {
-            $urls[] = [
+            $entries[] = [
                 'loc' => route('page.show', $page->slug),
                 'lastmod' => $page->updated_at->toAtomString(),
                 'changefreq' => 'monthly',
@@ -84,8 +86,20 @@ class HomeController extends Controller
             ];
         }
 
-        return response()
-            ->view('sitemap', compact('urls'))
-            ->header('Content-Type', 'text/xml; charset=UTF-8');
+        $xml = '<' . '?xml version="1.0" encoding="UTF-8"?' . '>' . "\n"
+            . '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">' . "\n";
+
+        foreach ($entries as $entry) {
+            $xml .= '    <url>' . "\n"
+                . '        <loc>' . e($entry['loc']) . '</loc>' . "\n"
+                . '        <lastmod>' . e($entry['lastmod']) . '</lastmod>' . "\n"
+                . '        <changefreq>' . e($entry['changefreq']) . '</changefreq>' . "\n"
+                . '        <priority>' . e($entry['priority']) . '</priority>' . "\n"
+                . '    </url>' . "\n";
+        }
+
+        $xml .= '</urlset>';
+
+        return response($xml)->header('Content-Type', 'text/xml; charset=UTF-8');
     }
 }

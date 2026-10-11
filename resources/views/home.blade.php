@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('seo_title', ($settings['brand_name'] ?? 'STONEBRIDGE ADVISORY') . ' — Confidential Advisory for Complex Lives')
+@section('seo_title', ($settings['brand_name'] ?? 'STONEBRIDGE ADVISORY') . ' - Confidential Advisory for Complex Lives')
 @section('seo_description', ($settings['hero_lead_1'] ?? 'Confidential advisory relationships for individuals navigating complex personal, relational, family, and leadership demands.') . ' ' . ($settings['hero_lead_2'] ?? 'Supporting those whose circumstances call for continuity, discretion, and thoughtful guidance.'))
 @section('seo_canonical', route('home'))
 {{-- Social share image: the Carl Malmsten portrait shown left of the founder copy (line ~1015). --}}
